@@ -5,7 +5,7 @@ import html2pdf from 'html2pdf.js';
 import Modal from '../components/Modal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
 
 const emptyForm = () => ({
   name: '', age: '', gender: 'Male', phone: '', address: '', bloodGroup: '', weight: '', diagnosis: '',

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Phone, History, Loader2, X, RefreshCw, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
 
 export default function Patients() {
   const navigate = useNavigate();

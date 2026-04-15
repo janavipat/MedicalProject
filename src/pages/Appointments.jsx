@@ -19,7 +19,7 @@ const STATUS_COLORS = {
   cancelled: { bg: '#f3f4f6', color: '#6b7280' },
 };
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
 
 const toISO = (d) => d.toISOString().split('T')[0];
 

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
 
 /* ── Dosha styles ─────────────────────────────────────────────────────────── */
 const DOSHA_STYLE = {

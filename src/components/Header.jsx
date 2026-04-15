@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const AVATAR_KEY = (uid) => `ayurclinic_avatar_${uid}`;
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
 
 export default function Header() {
   const { user, logout, authFetch } = useAuth();

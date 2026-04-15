@@ -8,7 +8,7 @@ import {
 import { useAuth } from '../context/AuthContext.jsx';
 import { saveUserProfile, readUserProfile } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
 
 const AVATAR_KEY = (uid) => `ayurclinic_avatar_${uid}`;
 
