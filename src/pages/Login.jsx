@@ -251,6 +251,11 @@ function friendlyError(code) {
     'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
     'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
     'auth/network-request-failed': 'Network error. Check your internet connection.',
+    'auth/unauthorized-domain': 'This domain is not authorized in Firebase. Go to Firebase Console → Authentication → Settings → Authorized Domains and add your Vercel URL.',
+    'auth/operation-not-allowed': 'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in methods.',
+    'auth/popup-blocked': 'Popup was blocked by the browser. Please allow popups for this site.',
+    'auth/cancelled-popup-request': 'Google sign-in was cancelled.',
+    'auth/internal-error': 'Firebase internal error. Check that your Firebase environment variables are correct in Vercel.',
   };
-  return map[code] || 'Sign-in failed. Please try again.';
+  return map[code] || `Sign-in failed (${code || 'unknown'}). Please try again.`;
 }
