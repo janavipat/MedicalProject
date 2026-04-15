@@ -2,19 +2,15 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: 'AIzaSyCSavbBMpWHs4FzlSLHk3viJB0hICrAh6c',
+  authDomain: 'abcd-fb39f.firebaseapp.com',
+  projectId: 'abcd-fb39f',
+  storageBucket: 'abcd-fb39f.firebasestorage.app',
+  messagingSenderId: '345319161170',
+  appId: '1:345319161170:web:b4065236bfad974d824e8b',
 };
 
-export const isFirebaseConfigured = Boolean(
-  firebaseConfig.apiKey &&
-  firebaseConfig.projectId &&
-  !firebaseConfig.apiKey.includes('undefined')
-);
+export const isFirebaseConfigured = true;
 
 let app = null;
 let auth = null;
