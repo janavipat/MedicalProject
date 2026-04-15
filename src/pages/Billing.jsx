@@ -1,0 +1,523 @@
+import { useState, useEffect, useCallback } from 'react';
+import {
+  IndianRupee, FileText, CheckCircle, Search,
+  Loader2, RefreshCw, AlertCircle, Plus, X, Trash2, User,
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext.jsx';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const fmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+const emptyItem = () => ({ id: Date.now() + Math.random(), description: '', amount: '' });
+
+// ─── Create Receipt Modal ─────────────────────────────────────────────────────
+function CreateReceiptModal({ onClose, onSaved, authFetch }) {
+  const [patientQuery, setPatientQuery]       = useState('');
+  const [patientSuggestions, setSuggestions]  = useState([]);
+  const [searching, setSearching]             = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null); // { _id, name } or null
+  const isNewPatient = patientQuery.trim().length > 1 && !selectedPatient;
+
+  const [items, setItems]               = useState([emptyItem()]);
+  const [billType, setBillType]         = useState('Consultation');
+  const [paymentMethod, setPayMethod]   = useState('Cash');
+  const [paidNow, setPaidNow]           = useState(false);
+  const [notes, setNotes]               = useState('');
+  const [saving, setSaving]             = useState(false);
+  const [error, setError]               = useState('');
+
+  const totalAmount = items.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+
+  // ── Patient search ──────────────────────────────────────────────────────────
+  const searchPatient = async (q) => {
+    setPatientQuery(q);
+    setSelectedPatient(null);
+    if (q.trim().length < 2) { setSuggestions([]); return; }
+    setSearching(true);
+    try {
+      const r = await authFetch(`${API}/api/patients/search?q=${encodeURIComponent(q)}`);
+      const data = await r.json();
+      setSuggestions(Array.isArray(data) ? data : []);
+    } catch { setSuggestions([]); }
+    finally { setSearching(false); }
+  };
+
+  const selectPatient = (p) => {
+    setPatientQuery(p.name);
+    setSelectedPatient({ _id: p._id || p.id, name: p.name });
+    setSuggestions([]);
+  };
+
+  const clearPatient = () => {
+    setPatientQuery('');
+    setSelectedPatient(null);
+    setSuggestions([]);
+  };
+
+  // ── Line items ──────────────────────────────────────────────────────────────
+  const updateItem = (id, field, val) =>
+    setItems(prev => prev.map(i => i.id === id ? { ...i, [field]: val } : i));
+  const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
+  const addItem    = () => setItems(prev => [...prev, emptyItem()]);
+
+  // ── Submit ──────────────────────────────────────────────────────────────────
+  const handleCreate = async () => {
+    if (!patientQuery.trim()) { setError('Please enter a patient name.'); return; }
+    if (totalAmount <= 0)     { setError('Add at least one item with a valid amount.'); return; }
+
+    setSaving(true); setError('');
+    try {
+      let patientId   = selectedPatient?._id || null;
+      let patientName = selectedPatient?.name || patientQuery.trim();
+
+      // ── If patient doesn't exist — create them ──────────────────────────────
+      if (!patientId) {
+        const cr = await authFetch(`${API}/api/patients`, {
+          method: 'POST',
+          body: JSON.stringify({ name: patientName, gender: 'Male' }),
+        });
+        if (!cr.ok) {
+          const e = await cr.json();
+          throw new Error(e.error || 'Failed to create patient');
+        }
+        const np = await cr.json();
+        patientId   = np._id;
+        patientName = np.name;
+      }
+
+      // ── Create the bill ─────────────────────────────────────────────────────
+      const validItems = items
+        .filter(i => i.description.trim() && Number(i.amount) > 0)
+        .map(i => ({ description: i.description.trim(), amount: Number(i.amount) }));
+
+      const br = await authFetch(`${API}/api/billing`, {
+        method: 'POST',
+        body: JSON.stringify({
+          patientId,
+          patientName,
+          items: validItems,
+          totalAmount,
+          billType,
+          paymentMethod: paidNow ? paymentMethod : undefined,
+          paidStatus: paidNow,
+          notes: notes.trim(),
+        }),
+      });
+
+      if (!br.ok) {
+        const e = await br.json();
+        throw new Error(e.error || 'Failed to create receipt');
+      }
+
+      onSaved();
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 999,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+    }}>
+      <div className="glass-panel" style={{ width: '560px', maxHeight: '90vh', overflowY: 'auto', padding: '28px' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
+          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <IndianRupee size={20} color="var(--primary)" /> Create Receipt
+          </h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+
+          {/* ── Patient Search ── */}
+          <div className="input-group" style={{ position: 'relative', margin: 0 }}>
+            <label className="input-label">
+              Patient Name <span style={{ color: 'red' }}>*</span>
+              {selectedPatient && (
+                <span style={{ marginLeft: '8px', fontSize: '0.72rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                  ✓ Existing Patient
+                </span>
+              )}
+              {isNewPatient && (
+                <span style={{ marginLeft: '8px', fontSize: '0.72rem', background: '#f0fdf4', color: '#2563eb', border: '1px solid #bfdbfe', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                  + New Patient — will be registered
+                </span>
+              )}
+            </label>
+            <div style={{ position: 'relative' }}>
+              <Search size={15} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+              <input
+                className="input-field"
+                style={{
+                  paddingLeft: '34px', paddingRight: selectedPatient ? '34px' : '12px',
+                  borderColor: selectedPatient ? '#86efac' : isNewPatient ? '#bfdbfe' : undefined,
+                }}
+                placeholder="Search existing or type new name..."
+                value={patientQuery}
+                onChange={e => searchPatient(e.target.value)}
+                autoComplete="off"
+              />
+              {searching && (
+                <Loader2 size={14} className="animate-spin" style={{ position: 'absolute', right: '11px', top: '50%', transform: 'translateY(-50%)', color: '#16a34a' }} />
+              )}
+              {selectedPatient && !searching && (
+                <button type="button" onClick={clearPatient} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}>
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+
+            {/* Autocomplete dropdown */}
+            {patientSuggestions.length > 0 && (
+              <div className="glass-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, maxHeight: '180px', overflowY: 'auto', padding: '4px', marginTop: '2px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
+                {patientSuggestions.map(p => (
+                  <div key={p._id || p.id} onClick={() => selectPatient(p)}
+                    style={{ padding: '9px 12px', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-muted)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{p.name}</div>
+                      <div style={{ fontSize: '0.73rem', color: '#6b7280', marginTop: '1px' }}>
+                        {p.age ? `${p.age}y` : ''}{p.age && p.gender ? ' • ' : ''}{p.gender || ''}{p.contact ? ` • ${p.contact}` : ''}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '0.7rem', background: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>Existing</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {isNewPatient && patientSuggestions.length === 0 && !searching && (
+              <div style={{ marginTop: '5px', fontSize: '0.76rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <User size={12} /> No existing patient found — a new record will be created automatically.
+              </div>
+            )}
+          </div>
+
+          {/* ── Bill Type ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="input-group" style={{ margin: 0 }}>
+              <label className="input-label">Bill Type</label>
+              <select className="input-field" value={billType} onChange={e => setBillType(e.target.value)} style={{ appearance: 'auto' }}>
+                <option value="Consultation">Consultation</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Procedure">Procedure</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div className="input-group" style={{ margin: 0 }}>
+              <label className="input-label">Payment Method</label>
+              <select className="input-field" value={paymentMethod} onChange={e => setPayMethod(e.target.value)} style={{ appearance: 'auto' }}>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          {/* ── Line Items ── */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <label className="input-label" style={{ margin: 0 }}>Items <span style={{ color: 'red' }}>*</span></label>
+              <button type="button" className="btn btn-outline" style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={addItem}>
+                <Plus size={13} /> Add Item
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {items.map((item, idx) => (
+                <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 36px', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    className="input-field"
+                    placeholder={`Item ${idx + 1} description`}
+                    value={item.description}
+                    onChange={e => updateItem(item.id, 'description', e.target.value)}
+                    style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                  />
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: '0.85rem' }}>₹</span>
+                    <input
+                      className="input-field"
+                      type="number" min="0" placeholder="0"
+                      value={item.amount}
+                      onChange={e => updateItem(item.id, 'amount', e.target.value)}
+                      style={{ padding: '8px 12px 8px 24px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => items.length > 1 && removeItem(item.id)}
+                    disabled={items.length === 1}
+                    style={{ background: 'none', border: 'none', cursor: items.length === 1 ? 'not-allowed' : 'pointer', color: items.length === 1 ? '#d1d5db' : '#ef4444', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Total */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
+              <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--primary)' }}>
+                Total: {fmt(totalAmount)}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Paid Now toggle ── */}
+          <div
+            onClick={() => setPaidNow(p => !p)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px',
+              borderRadius: '10px', cursor: 'pointer',
+              background: paidNow ? '#f0fdf4' : 'var(--bg-muted)',
+              border: `1.5px solid ${paidNow ? '#86efac' : 'var(--border-color)'}`,
+              transition: 'all 0.2s',
+            }}
+          >
+            <div style={{
+              width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
+              border: `2px solid ${paidNow ? '#16a34a' : '#d1d5db'}`,
+              background: paidNow ? '#16a34a' : 'white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+            }}>
+              {paidNow && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L5 9.5L10.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" /></svg>}
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: paidNow ? '#16a34a' : 'var(--text-main)' }}>
+                {paidNow ? '✓ Paid' : 'Mark as Paid Now'}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                {paidNow ? `Payment collected via ${paymentMethod}` : 'Leave unchecked to mark as pending'}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Notes ── */}
+          <div className="input-group" style={{ margin: 0 }}>
+            <label className="input-label">Notes (optional)</label>
+            <textarea
+              className="input-field" rows={2} style={{ resize: 'none', fontSize: '0.85rem' }}
+              placeholder="Any additional notes..."
+              value={notes} onChange={e => setNotes(e.target.value)}
+            />
+          </div>
+
+          {/* ── Error ── */}
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#dc2626', fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertCircle size={15} /> {error}
+            </div>
+          )}
+
+          {/* ── Actions ── */}
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleCreate} disabled={saving}>
+              {saving
+                ? <><Loader2 size={16} className="animate-spin" /> Creating...</>
+                : <><IndianRupee size={16} /> Create Receipt</>
+              }
+            </button>
+            <button className="btn btn-outline" onClick={onClose} disabled={saving}>Cancel</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Billing Page ────────────────────────────────────────────────────────
+export default function Billing() {
+  const { authFetch } = useAuth();
+  const [bills, setBills]           = useState([]);
+  const [totalRevenue, setTotalRev] = useState(0);
+  const [pendingRevenue, setPending] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [search, setSearch]         = useState('');
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState('');
+  const [markingId, setMarkingId]   = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
+
+  const fetchBills = useCallback(async () => {
+    setLoading(true); setError('');
+    try {
+      const r = await authFetch(`${API}/api/billing?limit=100`);
+      if (!r.ok) throw new Error();
+      const data = await r.json();
+      setBills(data.bills || []);
+      setTotalRev(data.totalRevenue || 0);
+      setPending(data.pendingRevenue || 0);
+      setTotalCount(data.total || 0);
+    } catch {
+      setError('Could not load billing data. Check backend connection.');
+    } finally {
+      setLoading(false);
+    }
+  }, [authFetch]);
+
+  useEffect(() => { fetchBills(); }, [fetchBills]);
+
+  const markPaid = async (id) => {
+    setMarkingId(id);
+    try {
+      await authFetch(`${API}/api/billing/${id}/pay`, { method: 'PATCH', body: JSON.stringify({ paymentMethod: 'Cash' }) });
+      fetchBills();
+    } catch { alert('Failed to mark as paid'); }
+    finally { setMarkingId(null); }
+  };
+
+  const filtered = bills.filter(b =>
+    (b.invoiceNumber || '').toLowerCase().includes(search.toLowerCase()) ||
+    (b.patientName   || '').toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="animate-fade-in">
+
+      {showCreate && (
+        <CreateReceiptModal
+          authFetch={authFetch}
+          onClose={() => setShowCreate(false)}
+          onSaved={() => { setShowCreate(false); fetchBills(); }}
+        />
+      )}
+
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Billing & Payments</h1>
+          <p className="page-subtitle">Manage invoices, collect payments, and track revenue</p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchBills}>
+            <RefreshCw size={16} /> Refresh
+          </button>
+          <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setShowCreate(true)}>
+            <Plus size={16} /> Create Receipt
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', padding: '10px 16px', marginBottom: '16px', fontSize: '0.84rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <AlertCircle size={16} color="#f59e0b" /> {error}
+        </div>
+      )}
+
+      <div className="dashboard-grid">
+        <div className="glass-panel stat-card">
+          <div className="stat-info">
+            <div className="stat-label">Total Revenue Collected</div>
+            <div className="stat-value" style={{ color: 'var(--success)' }}>
+              {loading ? '—' : fmt(totalRevenue)}
+            </div>
+          </div>
+          <IndianRupee size={40} color="var(--success)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
+        </div>
+        <div className="glass-panel stat-card">
+          <div className="stat-info">
+            <div className="stat-label">Pending Payments</div>
+            <div className="stat-value" style={{ color: 'var(--warning)' }}>
+              {loading ? '—' : fmt(pendingRevenue)}
+            </div>
+          </div>
+          <FileText size={40} color="var(--warning)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
+        </div>
+        <div className="glass-panel stat-card">
+          <div className="stat-info">
+            <div className="stat-label">Invoices Generated</div>
+            <div className="stat-value">{loading ? '—' : totalCount}</div>
+          </div>
+          <CheckCircle size={40} color="var(--text-main)" style={{ position: 'absolute', right: '20px', opacity: 0.1 }} />
+        </div>
+      </div>
+
+      <div className="glass-panel">
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+          <div className="input-field" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-input)' }}>
+            <Search size={20} color="var(--text-muted)" style={{ marginRight: '10px' }} />
+            <input
+              type="text"
+              placeholder="Search by Invoice ID or Patient Name..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none' }}
+            />
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '12px', color: '#9ca3af' }}>
+            <Loader2 size={32} className="animate-spin" color="#16a34a" />
+            <span style={{ fontSize: '0.88rem' }}>Loading billing records...</span>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
+            <FileText size={40} color="#e5e7eb" style={{ marginBottom: '12px' }} />
+            <div style={{ fontWeight: 600, marginBottom: '6px' }}>
+              {search ? 'No invoices match your search.' : 'No invoices yet.'}
+            </div>
+            {!search && (
+              <button className="btn btn-primary" style={{ marginTop: '10px', display: 'inline-flex', gap: '6px' }} onClick={() => setShowCreate(true)}>
+                <Plus size={16} /> Create First Receipt
+              </button>
+            )}
+          </div>
+        ) : (
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Patient Name</th>
+                <th>Date</th>
+                <th>Bill Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((bill) => (
+                <tr key={bill._id}>
+                  <td><span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{bill.invoiceNumber || bill._id?.slice(-6).toUpperCase()}</span></td>
+                  <td>{bill.patientName}</td>
+                  <td>{bill.createdAt ? new Date(bill.createdAt).toLocaleDateString('en-IN') : '—'}</td>
+                  <td>{bill.billType || 'Consultation'}</td>
+                  <td style={{ fontWeight: '600' }}>{fmt(bill.totalAmount)}</td>
+                  <td>
+                    <span className={`badge ${bill.paidStatus ? 'badge-success' : 'badge-warning'}`}>
+                      {bill.paidStatus ? 'Paid' : 'Pending'}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {!bill.paidStatus && (
+                        <button
+                          className="btn btn-primary"
+                          style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                          onClick={() => markPaid(bill._id)}
+                          disabled={markingId === bill._id}
+                        >
+                          {markingId === bill._id ? <Loader2 size={12} className="animate-spin" /> : '✓ Mark Paid'}
+                        </button>
+                      )}
+                      <button className="btn btn-outline" style={{ padding: '4px 8px', fontSize: '0.8rem' }}><FileText size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
