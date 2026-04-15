@@ -4,7 +4,7 @@ import { Calendar, User, History, Download, ArrowLeft, Loader2, Activity, AlertC
 import html2pdf from 'html2pdf.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
+const API = 'https://medical-project-h6yc.vercel.app';
 
 export default function PatientHistory() {
   const { id } = useParams();

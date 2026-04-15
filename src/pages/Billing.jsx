@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
+const API = 'https://medical-project-h6yc.vercel.app';
 const fmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
 const emptyItem = () => ({ id: Date.now() + Math.random(), description: '', amount: '' });
 

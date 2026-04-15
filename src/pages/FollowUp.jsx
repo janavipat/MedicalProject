@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Clock, PhoneCall, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const API = import.meta.env.VITE_API_URL || 'https://medical-project-h6yc.vercel.app';
+const API = 'https://medical-project-h6yc.vercel.app';
 
 const STATUS_CLASS = {
   Pending:   'badge-warning',
