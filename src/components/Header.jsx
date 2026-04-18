@@ -12,6 +12,7 @@ export default function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [notifLoading, setNotifLoading] = useState(false);
   const dropdownRef = useRef(null);
   const userMenuRef = useRef(null);
 
@@ -56,34 +57,37 @@ export default function Header() {
 
   // Build real notifications from low-stock + overdue follow-ups
   const fetchNotifications = useCallback(async () => {
+    setNotifLoading(true);
     const notifs = [];
     try {
-      // Low stock medicines
       const invR = await authFetch(`${API}/api/inventory`);
       if (invR.ok) {
         const inv = await invR.json();
-        const lowStock = inv.filter(i => i.stockQuantity <= (i.lowStockThreshold || 10) && i.stockQuantity > 0);
-        const outStock  = inv.filter(i => i.stockQuantity === 0);
-        outStock.slice(0, 2).forEach(i => notifs.push({
-          id: `out-${i._id}`, text: `Out of stock: ${i.medicineName}`, time: 'Inventory', type: 'danger'
-        }));
-        lowStock.slice(0, 3).forEach(i => notifs.push({
-          id: `low-${i._id}`, text: `Low stock: ${i.medicineName} (${i.stockQuantity} left)`, time: 'Inventory', type: 'warning'
-        }));
+        if (Array.isArray(inv)) {
+          const outStock = inv.filter(i => i.stockQuantity === 0);
+          const lowStock = inv.filter(i => i.stockQuantity > 0 && i.stockQuantity <= (i.lowStockThreshold || 10));
+          outStock.slice(0, 2).forEach(i => notifs.push({
+            id: `out-${i._id}`, text: `Out of stock: ${i.medicineName}`, time: 'Inventory', type: 'danger',
+          }));
+          lowStock.slice(0, 3).forEach(i => notifs.push({
+            id: `low-${i._id}`, text: `Low stock: ${i.medicineName} (${i.stockQuantity} left)`, time: 'Inventory', type: 'warning',
+          }));
+        }
       }
     } catch {}
     try {
-      // Overdue follow-ups
-      const fuR = await authFetch(`${API}/api/followup?overdue=true&limit=3`);
+      // Backend uses ?filter=overdue (not ?overdue=true)
+      const fuR = await authFetch(`${API}/api/followup?filter=overdue`);
       if (fuR.ok) {
         const fuData = await fuR.json();
-        const fus = Array.isArray(fuData.followups) ? fuData.followups : Array.isArray(fuData) ? fuData : [];
+        const fus = Array.isArray(fuData) ? fuData : (Array.isArray(fuData.followups) ? fuData.followups : []);
         fus.slice(0, 3).forEach(f => notifs.push({
-          id: `fu-${f._id}`, text: `Overdue follow-up: ${f.patientName}`, time: 'Follow-up', type: 'info'
+          id: `fu-${f._id}`, text: `Overdue follow-up: ${f.patientName}`, time: 'Follow-up', type: 'info',
         }));
       }
     } catch {}
     setNotifications(notifs);
+    setNotifLoading(false);
   }, [authFetch]);
 
   useEffect(() => {
@@ -211,17 +215,28 @@ export default function Header() {
           {showNotifications && (
             <div style={{
               position: 'absolute', top: '100%', right: '0', marginTop: '12px',
-              background: 'var(--bg-card)', border: '1px solid var(--glass-border)',
+              background: 'var(--bg-card)', border: '1px solid var(--border-color)',
               borderRadius: '12px', width: '320px', padding: '16px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50,
+              boxShadow: '0 10px 25px rgba(0,0,0,0.12)', zIndex: 400,
               display: 'flex', flexDirection: 'column', gap: '12px',
             }}>
-              <h3 style={{ margin: 0, paddingBottom: '8px', borderBottom: '1px solid var(--glass-border)', fontSize: '1rem' }}>
-                Notifications {notifications.length > 0 && <span style={{ fontSize: '0.75rem', background: '#fef2f2', color: '#ef4444', padding: '2px 8px', borderRadius: '20px', marginLeft: '8px' }}>{notifications.length}</span>}
+              <h3 style={{ margin: 0, paddingBottom: '8px', borderBottom: '1px solid var(--border-color)', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Notifications
+                {notifications.length > 0 && (
+                  <span style={{ fontSize: '0.75rem', background: '#fef2f2', color: '#ef4444', padding: '2px 8px', borderRadius: '20px' }}>
+                    {notifications.length}
+                  </span>
+                )}
+                {notifLoading && <Loader2 size={14} className="animate-spin" color="var(--primary)" style={{ marginLeft: 'auto' }} />}
               </h3>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '300px', overflowY: 'auto' }}>
-                {notifications.length > 0 ? notifications.map(notif => (
-                  <div key={notif.id} style={{ display: 'flex', flexDirection: 'column', gap: '3px', padding: '8px', background: 'var(--bg-muted)', borderRadius: '8px', borderLeft: `3px solid ${notifColor(notif.type)}` }}>
+                {notifLoading && notifications.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                    Checking for alerts…
+                  </div>
+                ) : notifications.length > 0 ? notifications.map(notif => (
+                  <div key={notif.id} style={{ display: 'flex', flexDirection: 'column', gap: '3px', padding: '8px 10px', background: 'var(--bg-muted)', borderRadius: '8px', borderLeft: `3px solid ${notifColor(notif.type)}` }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>{notif.text}</div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{notif.time}</div>
                   </div>
@@ -231,6 +246,7 @@ export default function Header() {
                   </div>
                 )}
               </div>
+
               {notifications.length > 0 && (
                 <button className="btn btn-outline" style={{ width: '100%', padding: '6px', fontSize: '0.82rem' }} onClick={handleMarkAllAsRead}>
                   Mark all as read
@@ -260,9 +276,9 @@ export default function Header() {
           {showUserMenu && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 8px)', right: '0',
-              background: 'var(--bg-card)', border: '1px solid var(--glass-border)',
+              background: 'var(--bg-card)', border: '1px solid var(--border-color)',
               borderRadius: '14px', padding: '8px', minWidth: '210px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.12)', zIndex: 50,
+              boxShadow: '0 10px 30px rgba(0,0,0,0.12)', zIndex: 400,
             }}>
               {/* Profile preview strip */}
               <div style={{ padding: '10px 14px 12px', borderBottom: '1px solid var(--border-color)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '10px' }}>
