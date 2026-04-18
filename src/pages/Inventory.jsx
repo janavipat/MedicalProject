@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Pill, AlertTriangle, Search, PlusCircle, ArrowDown, ArrowUp, Loader2, RefreshCw, X, Save, IndianRupee } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
 
@@ -176,10 +177,7 @@ export default function Inventory() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '12px', color: '#9ca3af' }}>
-            <Loader2 size={32} className="animate-spin" color="#16a34a" />
-            <span style={{ fontSize: '0.88rem' }}>Loading inventory...</span>
-          </div>
+          <MedicalLoader text="Loading inventory…" />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
             <Pill size={40} color="#e5e7eb" style={{ marginBottom: '10px' }} />

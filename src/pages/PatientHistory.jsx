@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, User, History, Download, ArrowLeft, Loader2, Activity, AlertCircle } from 'lucide-react';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 import html2pdf from 'html2pdf.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -74,14 +75,7 @@ export default function PatientHistory() {
     }).from(el).save();
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '16px', color: '#9ca3af' }}>
-        <Loader2 size={48} className="animate-spin" color="#16a34a" />
-        <p style={{ fontSize: '1rem', fontWeight: 500 }}>Opening Medical History...</p>
-      </div>
-    );
-  }
+  if (loading) return <MedicalLoader variant="page" text="Opening Medical History…" />;
 
   if (error || !patient) {
     return (

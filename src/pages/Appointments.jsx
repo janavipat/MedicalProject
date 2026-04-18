@@ -7,6 +7,7 @@ import {
   ChevronLeft, ChevronRight, XCircle,
   Filter, RefreshCw,
 } from 'lucide-react';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const STATUS_COLORS = {
@@ -219,10 +220,7 @@ function DoctorView() {
 
       {/* ── Content ── */}
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px 0', gap: '14px', color: '#9ca3af' }}>
-          <Loader2 size={40} className="animate-spin" color="#16a34a" />
-          <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Loading appointments...</span>
-        </div>
+        <MedicalLoader text="Loading appointments…" />
       ) : grouped.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '100px 0', color: '#9ca3af' }}>
           <Calendar size={52} color="#e5e7eb" style={{ marginBottom: '14px' }} />

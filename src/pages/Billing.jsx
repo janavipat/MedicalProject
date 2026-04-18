@@ -3,6 +3,7 @@ import {
   IndianRupee, FileText, CheckCircle, Search,
   Loader2, RefreshCw, AlertCircle, Plus, X, Trash2, User,
 } from 'lucide-react';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
@@ -455,10 +456,7 @@ export default function Billing() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '12px', color: '#9ca3af' }}>
-            <Loader2 size={32} className="animate-spin" color="#16a34a" />
-            <span style={{ fontSize: '0.88rem' }}>Loading billing records...</span>
-          </div>
+          <MedicalLoader text="Loading billing records…" />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
             <FileText size={40} color="#e5e7eb" style={{ marginBottom: '12px' }} />

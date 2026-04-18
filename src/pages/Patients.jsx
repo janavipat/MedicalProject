@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Phone, History, Loader2, X, RefreshCw, User, Trash2 } from 'lucide-react';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
@@ -121,10 +122,7 @@ export default function Patients() {
               {loading ? (
                 <tr>
                   <td colSpan="3">
-                    <div className="loader-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '12px' }}>
-                      <Loader2 className="animate-spin" size={40} color="#16a34a" />
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Opening Patient Records...</p>
-                    </div>
+                    <MedicalLoader text="Opening Patient Records…" />
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (

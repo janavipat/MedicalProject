@@ -3,6 +3,7 @@ import {
   BookOpen, Search, Edit, Plus, Loader2, RefreshCw, X, Save,
   ChevronDown, ChevronUp, Pill, Trash2, Stethoscope, Activity, Check,
 } from 'lucide-react';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
@@ -492,10 +493,7 @@ export default function DiseaseManager() {
 
       {/* Content */}
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '80px 0', gap: '12px', color: '#9ca3af' }}>
-          <Loader2 size={36} className="animate-spin" color="#16a34a" />
-          <span>Loading disease protocols...</span>
-        </div>
+        <MedicalLoader text="Loading disease protocols…" />
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '80px 0', color: '#9ca3af' }}>
           <BookOpen size={48} color="#e5e7eb" style={{ marginBottom: '14px' }} />

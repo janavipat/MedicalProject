@@ -6,6 +6,7 @@ import {
   ChevronDown, CalendarDays, IndianRupee,
   CheckCircle2, XCircle, Timer, Activity,
 } from 'lucide-react';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
@@ -365,10 +366,7 @@ export default function Dashboard() {
             </span>
           </div>
           {loadingChart ? (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '10px', color: '#9ca3af', minHeight: '260px' }}>
-              <Loader2 size={32} className="animate-spin" color="#16a34a" />
-              <span style={{ fontSize: '0.85rem' }}>Loading chart data...</span>
-            </div>
+            <MedicalLoader text="Loading chart data…" />
           ) : chart.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '8px', color: '#9ca3af', minHeight: '260px' }}>
               <TrendingUp size={40} color="#e5e7eb" />
@@ -426,10 +424,7 @@ export default function Dashboard() {
           {/* Queue list */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', maxHeight: '380px' }}>
             {loadingQueue ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 0', flexDirection: 'column', gap: '10px', color: '#9ca3af' }}>
-                <Loader2 size={28} className="animate-spin" color="#16a34a" />
-                <span style={{ fontSize: '0.82rem' }}>Loading queue...</span>
-              </div>
+              <MedicalLoader text="Loading queue…" />
             ) : filteredQueue.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '36px 0', color: '#9ca3af', fontSize: '0.85rem' }}>
                 <Calendar size={32} color="#e5e7eb" style={{ marginBottom: '8px' }} />

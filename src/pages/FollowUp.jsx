@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, PhoneCall, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import MedicalLoader from '../components/MedicalLoader.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
 
@@ -104,10 +105,7 @@ export default function FollowUp() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '12px', color: '#9ca3af' }}>
-            <Loader2 size={32} className="animate-spin" color="#16a34a" />
-            <span style={{ fontSize: '0.88rem' }}>Loading follow-ups...</span>
-          </div>
+          <MedicalLoader text="Loading follow-ups…" />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
             <CalendarIcon size={40} color="#e5e7eb" style={{ marginBottom: '10px' }} />
