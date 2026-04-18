@@ -66,16 +66,6 @@ export default function Patients() {
           <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchPatients}>
             <RefreshCw size={15} />
           </button>
-          <button
-            className="btn btn-outline"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#dc2626', borderColor: '#fca5a5' }}
-            onClick={handleCleanupTest}
-            disabled={cleanupLoading}
-            title="Delete all patients with 'test' in their name"
-          >
-            {cleanupLoading ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-            Delete Test Data
-          </button>
           <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => navigate('/prescription')}>
             <Plus size={18} /> Register New Patient
           </button>

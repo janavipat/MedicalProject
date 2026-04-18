@@ -70,9 +70,6 @@ function StatusSummary({ queue, loading }) {
           </span>
         );
       })}
-      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, marginLeft: '2px' }}>
-        · {total} total
-      </span>
     </div>
   );
 }
@@ -414,7 +411,7 @@ export default function Dashboard() {
               </p>
             </div>
             <span style={{ fontSize: '0.72rem', background: 'var(--bg-muted)', color: 'var(--text-muted)', padding: '3px 10px', borderRadius: '20px', fontWeight: 600, border: '1px solid var(--border-color)' }}>
-              {loadingQueue ? '…' : `${filteredQueue.length} shown`}
+              {loadingQueue ? '…' : `${filteredQueue.length} / ${queue.length} shown`}
             </span>
           </div>
 
@@ -422,7 +419,7 @@ export default function Dashboard() {
           <StatusSummary queue={queue} loading={loadingQueue} />
 
           {/* Queue list */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', maxHeight: '380px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {loadingQueue ? (
               <MedicalLoader text="Loading queue…" />
             ) : filteredQueue.length === 0 ? (

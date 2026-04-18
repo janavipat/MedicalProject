@@ -526,10 +526,9 @@ function ReceptionistView({ queue, onAddAppointment }) {
               }}>
                 {isEmergency && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1.5 6L5 9.5L10.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" /></svg>}
               </div>
-              <AlertTriangle size={20} color={isEmergency ? emergencyRed : '#9ca3af'} />
               <div>
                 <div style={{ fontWeight: 700, color: isEmergency ? emergencyRed : '#374151', fontSize: '0.95rem' }}>
-                  {isEmergency ? '🚨 EMERGENCY CASE — Highlighted in Queue' : 'Mark as Emergency Case'}
+                  {isEmergency ? 'EMERGENCY CASE — Highlighted in Queue' : 'Mark as Emergency Case'}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: isEmergency ? '#ef4444' : '#9ca3af' }}>
                   {isEmergency ? 'Patient will be prioritized and highlighted in red' : 'Tick if patient needs immediate attention'}

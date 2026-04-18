@@ -313,8 +313,8 @@ export default function Prescription() {
                 : 'Generate smart Ayurvedic prescriptions'}
             </p>
           </div>
-          <button className="btn btn-primary" onClick={handleNew} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Plus size={18} /> New Prescription
+          <button className="btn btn-primary" onClick={handleNew} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '0.875rem' }}>
+            <Plus size={16} /> New Prescription
           </button>
         </div>
 
@@ -467,7 +467,7 @@ export default function Prescription() {
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
                 <Pill size={20} color="var(--primary)" /> Recommended Medicines
               </h3>
-              <button className="btn btn-secondary" style={{ padding: '6px 12px' }} onClick={addMedicine}>
+              <button className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={addMedicine}>
                 <Plus size={16} /> Add Medicine
               </button>
             </div>
@@ -616,13 +616,13 @@ export default function Prescription() {
 
         {/* Action Buttons */}
         <div className="glass-panel" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          <button className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}
+          <button className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '11px', fontSize: '0.9rem' }}
             onClick={handleSave} disabled={loading}>
-            {loading ? <><Loader2 className="animate-spin" size={18} /> Saving...</> : <><Save size={18} /> Save Prescription</>}
+            {loading ? <><Loader2 className="animate-spin" size={16} /> Saving...</> : <><Save size={16} /> Save Prescription</>}
           </button>
-          <button className="btn btn-outline" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}
+          <button className="btn btn-outline" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '11px', fontSize: '0.9rem' }}
             onClick={handleDownload}>
-            <Download size={18} /> Download PDF
+            <Download size={16} /> Download PDF
           </button>
           <button className="btn btn-primary" style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'center', gap: '8px', background: '#25D366', border: 'none' }}
             onClick={handleWhatsApp}>
