@@ -32,26 +32,24 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      {/* Brand */}
-      <div className="sidebar-header" style={{ gap: '14px', paddingTop: '20px', paddingBottom: '20px', height: 'auto' }}>
-        <div style={{ background: 'rgba(22,163,74,0.10)', padding: '8px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Activity size={24} color="var(--primary)" strokeWidth={2} />
-        </div>
-        <span style={{ fontSize: '1.15rem', color: 'var(--text-main)', fontWeight: '700', letterSpacing: '-0.02em' }}>
-          AyurClinic
-        </span>
-      </div>
-
-      {/* Role badge */}
-      {role && (
-        <div style={{ margin: '0 16px 12px', padding: '10px 12px', borderRadius: '10px', background: badge.bg, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <RoleIcon size={16} color={badge.color} />
-          <div>
-            <div style={{ fontSize: '0.7rem', color: badge.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{role}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', fontWeight: 600, marginTop: '1px' }}>{userName || 'Staff'}</div>
+      {/* Brand + Role Badge aligned in header */}
+      <div className="sidebar-header" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '4px', padding: '0 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ background: 'rgba(22,163,74,0.10)', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Activity size={20} color="var(--primary)" strokeWidth={2} />
           </div>
+          <span style={{ fontSize: '1.1rem', color: 'var(--text-main)', fontWeight: '700', letterSpacing: '-0.02em' }}>
+            AyurClinic
+          </span>
         </div>
-      )}
+        {role && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingLeft: '2px' }}>
+            <RoleIcon size={12} color={badge.color} />
+            <span style={{ fontSize: '0.7rem', color: badge.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{role}</span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>· {userName || 'Staff'}</span>
+          </div>
+        )}
+      </div>
 
       {/* Nav links */}
       <nav className="sidebar-nav">
