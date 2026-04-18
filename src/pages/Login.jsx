@@ -31,14 +31,24 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     if (!isFirebaseConfigured) { setError('Firebase is not configured. Add your .env file and restart.'); return; }
+    if (googleLoading) { setGoogleLoading(false); return; } // clicking again cancels
     setError('');
     setGoogleLoading(true);
+
+    // Safety timeout — reset loader if popup hangs beyond 60s
+    const timeout = setTimeout(() => setGoogleLoading(false), 60_000);
     try {
       await loginWithGoogle();
+      clearTimeout(timeout);
       navigate('/dashboard');
     } catch (err) {
-      setError(friendlyError(err.code));
+      clearTimeout(timeout);
+      // Silently ignore user-dismissed popup; show error for everything else
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+        setError(friendlyError(err.code));
+      }
     } finally {
+      clearTimeout(timeout);
       setGoogleLoading(false);
     }
   };
@@ -206,30 +216,34 @@ export default function Login() {
           {/* Google Sign In */}
           <button
             onClick={handleGoogleLogin}
-            disabled={googleLoading}
             style={{
               width: '100%', padding: '11px',
-              border: '1.5px solid #e5e7eb', borderRadius: '10px',
-              background: 'white', cursor: googleLoading ? 'not-allowed' : 'pointer',
+              border: `1.5px solid ${googleLoading ? '#86efac' : '#e5e7eb'}`, borderRadius: '10px',
+              background: googleLoading ? '#f0fdf4' : 'white', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
               fontSize: '0.95rem', fontWeight: 600, color: '#374151',
-              opacity: googleLoading ? 0.7 : 1,
               transition: 'border-color 0.2s, box-shadow 0.2s',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#16a34a'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.1)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
+            onMouseEnter={(e) => { if (!googleLoading) { e.currentTarget.style.borderColor = '#16a34a'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.1)'; } }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = googleLoading ? '#86efac' : '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
           >
             {googleLoading ? (
-              <Loader2 size={18} className="animate-spin" />
+              <>
+                <Loader2 size={18} className="animate-spin" color="#16a34a" />
+                <span style={{ color: '#16a34a' }}>Opening Google…</span>
+                <span style={{ fontSize: '0.78rem', color: '#9ca3af', marginLeft: 4 }}>(click to cancel)</span>
+              </>
             ) : (
-              <svg width="18" height="18" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6C12.4 13 17.8 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/>
-                <path fill="#FBBC05" d="M10.6 28.6A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.1.7-4.6l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l8-6.1z"/>
-                <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.9l-8 6.1C6.7 42.6 14.7 48 24 48z"/>
-              </svg>
+              <>
+                <svg width="18" height="18" viewBox="0 0 48 48">
+                  <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6C12.4 13 17.8 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/>
+                  <path fill="#FBBC05" d="M10.6 28.6A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.1.7-4.6l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l8-6.1z"/>
+                  <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.9l-8 6.1C6.7 42.6 14.7 48 24 48z"/>
+                </svg>
+                Sign in with Google
+              </>
             )}
-            Sign in with Google
           </button>
 
           <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#6b7280', marginTop: '20px' }}>

@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut, UserCircle, Phone, History, X, Loader2 } from 'lucide-react';
+import { Bell, Search, User, LogOut, UserCircle, Phone, History, X, Loader2, RefreshCw } from 'lucide-react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -55,37 +55,57 @@ export default function Header() {
 
   const clearSearch = () => { setSearchQuery(''); setSearchResults([]); setShowSearch(false); };
 
-  // Build real notifications from low-stock + overdue follow-ups
+  // Build notifications from: today's appointments + low/out stock + overdue follow-ups
   const fetchNotifications = useCallback(async () => {
     setNotifLoading(true);
     const notifs = [];
+    const todayISO = new Date().toISOString().split('T')[0];
+
+    // ── Today's appointments ──────────────────────────────────────────────────
     try {
-      const invR = await authFetch(`${API}/api/inventory`);
-      if (invR.ok) {
-        const inv = await invR.json();
+      const r = await authFetch(`${API}/api/appointments?startDate=${todayISO}&endDate=${todayISO}`);
+      if (r.ok) {
+        const data = await r.json();
+        const appts = Array.isArray(data.appointments) ? data.appointments : Array.isArray(data) ? data : [];
+        const waiting   = appts.filter(a => a.status === 'Waiting'   || a.status === 'pending');
+        const scheduled = appts.filter(a => a.status === 'Scheduled');
+        if (waiting.length > 0) notifs.push({
+          id: 'appt-waiting', text: `${waiting.length} patient${waiting.length > 1 ? 's' : ''} waiting in queue`, time: 'Today', type: 'warning',
+        });
+        if (scheduled.length > 0) notifs.push({
+          id: 'appt-scheduled', text: `${scheduled.length} appointment${scheduled.length > 1 ? 's' : ''} scheduled today`, time: 'Today', type: 'info',
+        });
+      }
+    } catch {}
+
+    // ── Inventory: out-of-stock + low stock ───────────────────────────────────
+    try {
+      const r = await authFetch(`${API}/api/inventory`);
+      if (r.ok) {
+        const inv = await r.json();
         if (Array.isArray(inv)) {
-          const outStock = inv.filter(i => i.stockQuantity === 0);
-          const lowStock = inv.filter(i => i.stockQuantity > 0 && i.stockQuantity <= (i.lowStockThreshold || 10));
-          outStock.slice(0, 2).forEach(i => notifs.push({
+          inv.filter(i => i.stockQuantity === 0).slice(0, 2).forEach(i => notifs.push({
             id: `out-${i._id}`, text: `Out of stock: ${i.medicineName}`, time: 'Inventory', type: 'danger',
           }));
-          lowStock.slice(0, 3).forEach(i => notifs.push({
+          inv.filter(i => i.stockQuantity > 0 && i.stockQuantity <= (i.lowStockThreshold || 10)).slice(0, 3).forEach(i => notifs.push({
             id: `low-${i._id}`, text: `Low stock: ${i.medicineName} (${i.stockQuantity} left)`, time: 'Inventory', type: 'warning',
           }));
         }
       }
     } catch {}
+
+    // ── Overdue follow-ups ────────────────────────────────────────────────────
     try {
-      // Backend uses ?filter=overdue (not ?overdue=true)
-      const fuR = await authFetch(`${API}/api/followup?filter=overdue`);
-      if (fuR.ok) {
-        const fuData = await fuR.json();
-        const fus = Array.isArray(fuData) ? fuData : (Array.isArray(fuData.followups) ? fuData.followups : []);
+      const r = await authFetch(`${API}/api/followup?filter=overdue`);
+      if (r.ok) {
+        const data = await r.json();
+        const fus = Array.isArray(data) ? data : (Array.isArray(data.followups) ? data.followups : []);
         fus.slice(0, 3).forEach(f => notifs.push({
-          id: `fu-${f._id}`, text: `Overdue follow-up: ${f.patientName}`, time: 'Follow-up', type: 'info',
+          id: `fu-${f._id}`, text: `Overdue follow-up: ${f.patientName}`, time: 'Follow-up', type: 'danger',
         }));
       }
     } catch {}
+
     setNotifications(notifs);
     setNotifLoading(false);
   }, [authFetch]);
@@ -220,15 +240,22 @@ export default function Header() {
               boxShadow: '0 10px 25px rgba(0,0,0,0.12)', zIndex: 400,
               display: 'flex', flexDirection: 'column', gap: '12px',
             }}>
-              <h3 style={{ margin: 0, paddingBottom: '8px', borderBottom: '1px solid var(--border-color)', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Notifications
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)' }}>
+                <span style={{ fontWeight: 700, fontSize: '1rem', flex: 1 }}>Notifications</span>
                 {notifications.length > 0 && (
                   <span style={{ fontSize: '0.75rem', background: '#fef2f2', color: '#ef4444', padding: '2px 8px', borderRadius: '20px' }}>
                     {notifications.length}
                   </span>
                 )}
-                {notifLoading && <Loader2 size={14} className="animate-spin" color="var(--primary)" style={{ marginLeft: 'auto' }} />}
-              </h3>
+                <button
+                  onClick={fetchNotifications}
+                  disabled={notifLoading}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: 'var(--text-muted)', display: 'flex' }}
+                  title="Refresh notifications"
+                >
+                  <RefreshCw size={13} className={notifLoading ? 'animate-spin' : ''} />
+                </button>
+              </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '300px', overflowY: 'auto' }}>
                 {notifLoading && notifications.length === 0 ? (
