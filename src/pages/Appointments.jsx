@@ -41,7 +41,7 @@ function DoctorView() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [weekStart, setWeekStart]       = useState(() => getMonday(new Date()));
-  const [filterDate, setFilterDate]     = useState('');
+  const [filterDate, setFilterDate]     = useState(() => toISO(new Date()));
   const [filterStatus, setFilterStatus] = useState('');
 
   const weekEnd = useMemo(() => {

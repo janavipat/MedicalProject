@@ -248,7 +248,6 @@ export default function Header() {
           >
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{displayName}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{user?.email || 'Practitioner'}</div>
             </div>
             <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {photoURL

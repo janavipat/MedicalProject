@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Phone, History, Loader2, X, RefreshCw, User } from 'lucide-react';
+import { Search, Plus, Phone, History, Loader2, X, RefreshCw, User, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
@@ -9,10 +9,11 @@ export default function Patients() {
   const navigate = useNavigate();
   const { authFetch } = useAuth();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [patients, setPatients]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState('');
+  const [searchTerm, setSearchTerm]       = useState('');
+  const [patients, setPatients]           = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState('');
+  const [cleanupLoading, setCleanupLoading] = useState(false);
 
   const fetchPatients = useCallback(async () => {
     setLoading(true);
@@ -32,6 +33,21 @@ export default function Patients() {
 
   useEffect(() => { fetchPatients(); }, [fetchPatients]);
 
+  const handleCleanupTest = async () => {
+    if (!window.confirm('Delete all patients with "test" in their name and their prescriptions? This cannot be undone.')) return;
+    setCleanupLoading(true);
+    try {
+      const res = await authFetch(`${API}/api/patients/cleanup-test`, { method: 'DELETE' });
+      const data = await res.json();
+      alert(data.message || 'Cleanup complete.');
+      fetchPatients();
+    } catch {
+      alert('Cleanup failed. Please try again.');
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
   // Client-side filter (same as reference)
   const filtered = patients.filter(p =>
     p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,6 +64,16 @@ export default function Patients() {
         <div style={{ display: 'flex', gap: '10px' }}>
           <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchPatients}>
             <RefreshCw size={15} />
+          </button>
+          <button
+            className="btn btn-outline"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#dc2626', borderColor: '#fca5a5' }}
+            onClick={handleCleanupTest}
+            disabled={cleanupLoading}
+            title="Delete all patients with 'test' in their name"
+          >
+            {cleanupLoading ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+            Delete Test Data
           </button>
           <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => navigate('/prescription')}>
             <Plus size={18} /> Register New Patient
@@ -88,14 +114,13 @@ export default function Patients() {
               <tr>
                 <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Patient Info</th>
                 <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Contact</th>
-                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Last Prescription</th>
                 <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="4">
+                  <td colSpan="3">
                     <div className="loader-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '12px' }}>
                       <Loader2 className="animate-spin" size={40} color="#16a34a" />
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Opening Patient Records...</p>
@@ -104,7 +129,7 @@ export default function Patients() {
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan="4" style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
+                  <td colSpan="3" style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
                     <User size={40} color="#e5e7eb" style={{ marginBottom: '10px' }} />
                     <div style={{ fontWeight: 600 }}>{searchTerm ? 'No patients match your search.' : 'No patients yet.'}</div>
                     <div style={{ fontSize: '0.82rem', marginTop: '6px' }}>Patients are registered when appointments are booked or prescriptions are created.</div>
@@ -125,20 +150,6 @@ export default function Patients() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Phone size={14} /> {p.contact || p.phone || '—'}
                       </div>
-                    </td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
-                      {p.lastPrescription ? (
-                        <>
-                          <div style={{ fontWeight: 500 }}>
-                            {new Date(p.lastPrescription.createdAt).toLocaleDateString('en-IN')}
-                          </div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                            {p.lastPrescription.diagnosis || '—'}
-                          </div>
-                        </>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No history</span>
-                      )}
                     </td>
                     <td style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
                       <button

@@ -93,7 +93,7 @@ export default function Signup() {
               <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '5px' }}>Full Name</label>
               <div style={{ position: 'relative' }}>
                 <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                <input type="text" required value={form.name} onChange={update('name')} placeholder="Dr. Janavi Patel" style={inputStyle}
+                <input type="text" required value={form.name} onChange={update('name')} placeholder="Enter your full name" style={inputStyle}
                   onFocus={(e) => e.target.style.borderColor = '#16a34a'}
                   onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
               </div>
