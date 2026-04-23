@@ -14,7 +14,7 @@ const emptyForm = () => ({
 const emptyMed = () => ({ id: Date.now() + Math.random(), name: '', timing: '', anupan: '', days: 7 });
 
 export default function Prescription() {
-  const { authFetch } = useAuth();
+  const { authFetch, userName } = useAuth();
   const location = useLocation();
 
   const [loading, setLoading] = useState(false);
@@ -166,8 +166,8 @@ export default function Prescription() {
     } catch { setMedicineSuggestions(prev => ({ ...prev, [rowId]: [] })); }
   };
 
-  const selectMedicine = (id, medicineName) => {
-    setMedicines(prev => prev.map(m => m.id === id ? { ...m, name: medicineName } : m));
+  const selectMedicine = (id, medicineName, inventoryId) => {
+    setMedicines(prev => prev.map(m => m.id === id ? { ...m, name: medicineName, inventoryId } : m));
     setMedicineSuggestions(prev => ({ ...prev, [id]: [] }));
   };
 
@@ -225,6 +225,17 @@ export default function Prescription() {
           });
 
           if (pr.ok) {
+            // Auto-reduce inventory stock for each prescribed medicine from inventory
+            const inventoryMeds = medicines.filter(m => m.inventoryId && m.name.trim());
+            await Promise.allSettled(
+              inventoryMeds.map(m =>
+                authFetch(`${API}/api/inventory/${m.inventoryId}/consume`, {
+                  method: 'PATCH',
+                  body: JSON.stringify({ quantity: 1 }),
+                })
+              )
+            );
+
             // Mark appointment as Completed
             if (linkedAppointment?._id) {
               // Came via "Consult" button — update that specific appointment
@@ -504,7 +515,7 @@ export default function Prescription() {
                             return (
                               <div
                                 key={s._id}
-                                onMouseDown={() => selectMedicine(med.id, s.medicineName)}
+                                onMouseDown={() => selectMedicine(med.id, s.medicineName, s._id)}
                                 style={{ padding: '9px 14px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)' }}
                                 onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-muted)'}
                                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -561,12 +572,14 @@ export default function Prescription() {
           {/* Clinic Header */}
           <div style={{ borderBottom: '2px solid #16a34a', paddingBottom: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ color: '#16a34a', margin: 0 }}>Sanjivani Clinic</h2>
-              <div style={{ fontSize: '0.9rem', color: '#333', fontWeight: 'bold' }}>Dr. Dharmesh C. Sapovadiya</div>
-              <div style={{ fontSize: '0.8rem', color: '#666' }}>Qualification: B.A.M.S.</div>
+              <h2 style={{ color: '#16a34a', margin: 0 }}>Apollo Clinic</h2>
+              <div style={{ fontSize: '0.9rem', color: '#333', fontWeight: 'bold' }}>
+                {userName ? `Dr. ${userName}` : 'Doctor'}
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#666' }}>Apollo Hospitals Group</div>
             </div>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-              SC
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.8rem' }}>
+              AC
             </div>
           </div>
 

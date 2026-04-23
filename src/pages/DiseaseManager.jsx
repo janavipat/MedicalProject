@@ -231,27 +231,27 @@ function DiseaseModal({ disease, onClose, onSave }) {
           </button>
         </div>
 
-        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
           {/* Section: Basic Info */}
-          <section>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <BookOpen size={12} /> Basic Information
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-              <div className="input-group">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="input-group" style={{ marginBottom: 0 }}>
                 <label className="input-label">Disease Name (Ayurvedic) <span style={{ color: '#ef4444' }}>*</span></label>
                 <input className="input-field" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Amlapitta" autoFocus />
               </div>
-              <div className="input-group">
+              <div className="input-group" style={{ marginBottom: 0 }}>
                 <label className="input-label">Local / Common Name</label>
                 <input className="input-field" value={form.localName} onChange={e => set('localName', e.target.value)} placeholder="e.g. Hyperacidity / GERD" />
               </div>
-              <div className="input-group">
+              <div className="input-group" style={{ marginBottom: 0 }}>
                 <label className="input-label">System / Type</label>
                 <input className="input-field" value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Digestive, Respiratory" />
               </div>
-              <div className="input-group">
+              <div className="input-group" style={{ marginBottom: 0 }}>
                 <label className="input-label">Main Dosha</label>
                 <select className="input-field" value={form.mainDosha} onChange={e => set('mainDosha', e.target.value)} style={{ appearance: 'auto' }}>
                   <option value="">Select Dosha</option>
@@ -269,8 +269,8 @@ function DiseaseModal({ disease, onClose, onSave }) {
           </section>
 
           {/* Section: Medicines */}
-          <section>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #059669' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Pill size={12} /> Standard Medicines (from Inventory)
             </div>
 
@@ -365,35 +365,34 @@ function DiseaseModal({ disease, onClose, onSave }) {
           </section>
 
           {/* Section: Pathya / Apathya */}
-          <section>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
-              Lifestyle Guidance
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-              <div className="input-group">
-                <label className="input-label" style={{ color: '#16a34a' }}>✓ Pathya — Do's / Recommended</label>
-                <textarea
-                  className="input-field"
-                  rows={4}
-                  value={form.pathya}
-                  onChange={e => set('pathya', e.target.value)}
-                  placeholder="e.g. Light easily digestible food, rest..."
-                  style={{ resize: 'vertical', borderColor: 'rgba(22,163,74,0.2)' }}
-                />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <section style={{ background: '#f0fdf4', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #16a34a' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Check size={12} /> Pathya — Do's
               </div>
-              <div className="input-group">
-                <label className="input-label" style={{ color: '#dc2626' }}>✗ Apathya — Don'ts / Avoid</label>
-                <textarea
-                  className="input-field"
-                  rows={4}
-                  value={form.apathya}
-                  onChange={e => set('apathya', e.target.value)}
-                  placeholder="e.g. Spicy food, heavy meals, cold drinks..."
-                  style={{ resize: 'vertical', borderColor: 'rgba(220,38,38,0.2)' }}
-                />
+              <textarea
+                className="input-field"
+                rows={4}
+                value={form.pathya}
+                onChange={e => set('pathya', e.target.value)}
+                placeholder="e.g. Light easily digestible food, rest..."
+                style={{ resize: 'vertical', borderColor: 'rgba(22,163,74,0.25)', background: 'white', marginBottom: 0 }}
+              />
+            </section>
+            <section style={{ background: '#fef2f2', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #dc2626' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <X size={12} /> Apathya — Don'ts
               </div>
-            </div>
-          </section>
+              <textarea
+                className="input-field"
+                rows={4}
+                value={form.apathya}
+                onChange={e => set('apathya', e.target.value)}
+                placeholder="e.g. Spicy food, heavy meals, cold drinks..."
+                style={{ resize: 'vertical', borderColor: 'rgba(220,38,38,0.2)', background: 'white', marginBottom: 0 }}
+              />
+            </section>
+          </div>
 
           {/* Error */}
           {error && (
@@ -456,38 +455,39 @@ export default function DiseaseManager() {
     <div className="animate-fade-in">
       {showModal && <DiseaseModal disease={editTarget} onClose={closeModal} onSave={handleSaved} />}
 
-      {/* Page header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Smart Disease Manager</h1>
-          <p className="page-subtitle">Configure protocols, pathya-apathya, and standard medicines</p>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchDiseases}>
-            <RefreshCw size={15} />
-          </button>
-          <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={openAdd}>
-            <Plus size={18} /> Add Disease
-          </button>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="glass-panel" style={{ marginBottom: '20px', padding: '12px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Search size={18} color="var(--text-muted)" />
-          <input
-            type="text"
-            placeholder="Search by disease name, local name, or body system..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none', fontSize: '0.9rem' }}
-          />
-          {search && (
-            <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}>
-              <X size={16} />
+      {/* Sticky top section: page header + search */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--bg-dark)', paddingTop: '24px', paddingBottom: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h1 className="page-title">Smart Disease Manager</h1>
+            <p className="page-subtitle">Configure protocols, pathya-apathya, and standard medicines</p>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchDiseases}>
+              <RefreshCw size={15} />
             </button>
-          )}
+            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={openAdd}>
+              <Plus size={18} /> Add Disease
+            </button>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '12px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Search size={18} color="var(--text-muted)" />
+            <input
+              type="text"
+              placeholder="Search by disease name, local name, or body system..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none', fontSize: '0.9rem' }}
+            />
+            {search && (
+              <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}>
+                <X size={16} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

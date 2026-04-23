@@ -15,67 +15,112 @@ function AddMedicineModal({ onClose, onSaved }) {
   const { authFetch } = useAuth();
   const [form, setForm] = useState({ medicineName: '', brand: '', formulation: '', stockQuantity: '', price: '', expiryDate: '', lowStockThreshold: 10 });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = async () => {
-    if (!form.medicineName.trim()) { alert('Medicine name required'); return; }
-    if (!form.stockQuantity || !form.price) { alert('Stock quantity and price are required'); return; }
+    setError('');
+    if (!form.medicineName.trim()) { setError('Medicine name is required.'); return; }
+    if (!form.stockQuantity) { setError('Stock quantity is required.'); return; }
+    if (!form.price) { setError('Price is required.'); return; }
     setSaving(true);
     try {
-      const r = await authFetch(`${API}/api/inventory`, { method: 'POST', body: JSON.stringify({ ...form, stockQuantity: Number(form.stockQuantity), price: Number(form.price), lowStockThreshold: Number(form.lowStockThreshold) }) });
-      if (!r.ok) throw new Error();
+      const r = await authFetch(`${API}/api/inventory`, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...form,
+          stockQuantity: Number(form.stockQuantity),
+          price: Number(form.price),
+          lowStockThreshold: Number(form.lowStockThreshold),
+        }),
+      });
+      if (!r.ok) {
+        const e = await r.json().catch(() => ({}));
+        throw new Error(e.error || 'Failed to add medicine.');
+      }
       onSaved();
-    } catch { alert('Failed to add medicine.'); }
+    } catch (e) { setError(e.message); }
     finally { setSaving(false); }
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel" style={{ width: '500px', padding: '28px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Add New Medicine</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="input-group">
-            <label className="input-label">Medicine Name *</label>
-            <input className="input-field" value={form.medicineName} onChange={e => set('medicineName', e.target.value)} placeholder="e.g. Triphala Churna" />
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div className="glass-panel" style={{ width: '520px', padding: 0, borderRadius: '20px', overflow: 'hidden' }}>
+
+        {/* Modal header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Pill size={18} color="#16a34a" />
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Add New Medicine</h2>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Add to inventory for tracking & prescriptions</p>
+            </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <div className="input-group">
+          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
+          ><X size={16} /></button>
+        </div>
+
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', fontSize: '0.85rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={15} /> {error}
+            </div>
+          )}
+
+          {/* Medicine name */}
+          <div style={{ background: 'var(--bg-muted)', borderRadius: '10px', padding: '14px', borderLeft: '3px solid var(--primary)' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Medicine Name <span style={{ color: '#ef4444' }}>*</span></label>
+              <input className="input-field" value={form.medicineName} onChange={e => set('medicineName', e.target.value)} placeholder="e.g. Triphala Churna" autoFocus />
+            </div>
+          </div>
+
+          {/* Brand + Formulation */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Brand</label>
               <input className="input-field" value={form.brand} onChange={e => set('brand', e.target.value)} placeholder="e.g. Baidyanath" />
             </div>
-            <div className="input-group">
+            <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Formulation</label>
               <input className="input-field" value={form.formulation} onChange={e => set('formulation', e.target.value)} placeholder="e.g. Churna, Vati, Tablet" />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <div className="input-group">
-              <label className="input-label">Stock Quantity *</label>
+
+          {/* Stock + Price */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Stock Quantity <span style={{ color: '#ef4444' }}>*</span></label>
               <input className="input-field" type="number" min="0" value={form.stockQuantity} onChange={e => set('stockQuantity', e.target.value)} placeholder="0" />
             </div>
-            <div className="input-group">
-              <label className="input-label">Price (₹) *</label>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Price (₹) <span style={{ color: '#ef4444' }}>*</span></label>
               <input className="input-field" type="number" min="0" value={form.price} onChange={e => set('price', e.target.value)} placeholder="0" />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <div className="input-group">
+
+          {/* Expiry + Low stock threshold */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Expiry Date</label>
               <input className="input-field" type="date" value={form.expiryDate} onChange={e => set('expiryDate', e.target.value)} />
             </div>
-            <div className="input-group">
+            <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Low Stock Alert Level</label>
               <input className="input-field" type="number" min="1" value={form.lowStockThreshold} onChange={e => set('lowStockThreshold', e.target.value)} />
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
+
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '4px' }}>
             <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleSave} disabled={saving}>
-              {saving ? <><Loader2 size={16} className="animate-spin" />Saving...</> : <><Save size={16} />Add Medicine</>}
+              {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> Add Medicine</>}
             </button>
-            <button className="btn btn-outline" onClick={onClose}>Cancel</button>
+            <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '90px' }}>Cancel</button>
           </div>
         </div>
       </div>

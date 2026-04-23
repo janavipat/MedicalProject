@@ -267,11 +267,7 @@ export default function Header() {
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>{notif.text}</div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{notif.time}</div>
                   </div>
-                )) : (
-                  <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                    ✅ All clear — no alerts
-                  </div>
-                )}
+                )) : null}
               </div>
 
               {notifications.length > 0 && (
