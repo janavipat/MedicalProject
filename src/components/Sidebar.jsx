@@ -39,7 +39,7 @@ export default function Sidebar() {
             <Activity size={20} color="var(--primary)" strokeWidth={2} />
           </div>
           <span style={{ fontSize: '1.1rem', color: 'var(--text-main)', fontWeight: '700', letterSpacing: '-0.02em' }}>
-            AyurClinic
+            Apollo Clinic
           </span>
         </div>
         {role && (

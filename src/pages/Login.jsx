@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Mail, Lock, Eye, EyeOff, Loader2, AlertTriangle, Activity } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, AlertTriangle, Heart, Shield, Users, Activity } from 'lucide-react';
+
+const FONT = "'Inter', system-ui, sans-serif";
 
 export default function Login() {
   const { loginWithEmail, loginWithGoogle, isFirebaseConfigured } = useAuth();
@@ -31,11 +33,9 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     if (!isFirebaseConfigured) { setError('Firebase is not configured. Add your .env file and restart.'); return; }
-    if (googleLoading) { setGoogleLoading(false); return; } // clicking again cancels
+    if (googleLoading) { setGoogleLoading(false); return; }
     setError('');
     setGoogleLoading(true);
-
-    // Safety timeout — reset loader if popup hangs beyond 60s
     const timeout = setTimeout(() => setGoogleLoading(false), 60_000);
     try {
       await loginWithGoogle();
@@ -43,7 +43,6 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err) {
       clearTimeout(timeout);
-      // Silently ignore user-dismissed popup; show error for everything else
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setError(friendlyError(err.code));
       }
@@ -53,175 +52,229 @@ export default function Login() {
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '12px 12px 12px 42px',
+    border: '1.5px solid #e5e7eb',
+    borderRadius: '10px',
+    fontSize: '0.925rem',
+    color: '#111827',
+    outline: 'none',
+    fontFamily: FONT,
+    background: '#fafafa',
+    transition: 'border-color 0.2s, background 0.2s',
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    color: '#374151',
+    marginBottom: '6px',
+    fontFamily: FONT,
+    letterSpacing: '0.02em',
+    textTransform: 'uppercase',
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#f1f5f9',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
+      fontFamily: FONT,
     }}>
+      {/* Left branding panel */}
       <div style={{
-        background: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-        width: '100%',
-        maxWidth: '420px',
+        flex: '0 0 42%',
+        background: 'linear-gradient(160deg, #16a34a 0%, #0f5f30 60%, #064e25 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '60px 48px',
+        color: 'white',
+        position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #16a34a, #15803d)',
-          padding: '36px 40px 28px',
-          textAlign: 'center',
-        }}>
-          <div style={{
-            width: '56px', height: '56px',
-            background: 'rgba(255,255,255,0.15)',
-            borderRadius: '12px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px',
-          }}>
-            <Activity size={28} color="white" strokeWidth={2} />
-          </div>
-          <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>AyurClinic</h1>
-          <p style={{ color: 'rgba(255,255,255,0.75)', margin: '6px 0 0', fontSize: '0.875rem' }}>
-            Sign in to manage your clinic
-          </p>
-        </div>
+        {/* Decorative circles */}
+        <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '240px', height: '240px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
 
-        {/* Form */}
-        <div style={{ padding: '32px 40px 36px' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Logo */}
+          <div style={{
+            width: '80px', height: '80px',
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '22px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '28px',
+            border: '1.5px solid rgba(255,255,255,0.2)',
+          }}>
+            <Activity size={38} color="white" strokeWidth={1.8} />
+          </div>
+
+          <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', textAlign: 'center' }}>
+            Apollo Clinic
+          </h1>
+          <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: '1.6', margin: '0 0 48px', maxWidth: '260px' }}>
+            Complete clinic management for modern healthcare
+          </p>
+
+          {/* Features */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%', maxWidth: '260px' }}>
+            {[
+              { icon: Users, text: 'Patient & Appointment Management' },
+              { icon: Heart, text: 'Prescriptions & Follow-ups' },
+              { icon: Shield, text: 'Secure & Role-based Access' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: '36px', height: '36px', flexShrink: 0,
+                  background: 'rgba(255,255,255,0.12)',
+                  borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={17} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+                </div>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.4' }}>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <div style={{
+        flex: 1,
+        background: '#f8faf9',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 32px',
+      }}>
+        <div style={{ width: '100%', maxWidth: '400px' }}>
+
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', margin: '0 0 6px', letterSpacing: '-0.03em' }}>
+            Welcome back
+          </h2>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0 0 32px' }}>
+            Sign in to your clinic account
+          </p>
+
+          {/* Firebase warning */}
           {!isFirebaseConfigured && (
             <div style={{
               background: '#fffbeb', border: '1px solid #fcd34d',
-              color: '#92400e', borderRadius: '8px',
+              color: '#92400e', borderRadius: '10px',
               padding: '12px 14px', marginBottom: '20px',
-              fontSize: '0.82rem', lineHeight: '1.6',
+              fontSize: '0.82rem', lineHeight: '1.6', fontFamily: FONT,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, marginBottom: '6px' }}>
-                <AlertTriangle size={16} /> Firebase Not Configured
+                <AlertTriangle size={15} /> Firebase Not Configured
               </div>
-              Create a <code>.env</code> file in the project root with your Firebase keys:<br />
-              <code style={{ display: 'block', marginTop: '6px', background: '#fef3c7', padding: '6px 8px', borderRadius: '4px', fontSize: '0.78rem' }}>
-                VITE_FIREBASE_API_KEY=...<br />
-                VITE_FIREBASE_AUTH_DOMAIN=...<br />
-                VITE_FIREBASE_PROJECT_ID=...<br />
-                VITE_FIREBASE_APP_ID=...
-              </code>
-              Then restart the dev server.
+              Create a <code>.env</code> file with your Firebase keys, then restart the dev server.
             </div>
           )}
 
+          {/* Error */}
           {error && (
             <div style={{
               background: '#fef2f2', border: '1px solid #fecaca',
-              color: '#dc2626', borderRadius: '8px',
+              color: '#dc2626', borderRadius: '10px',
               padding: '10px 14px', marginBottom: '20px',
-              fontSize: '0.875rem',
+              fontSize: '0.875rem', fontFamily: FONT,
             }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {/* Email */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                Email Address
-              </label>
+              <label style={labelStyle}>Email Address</label>
               <div style={{ position: 'relative' }}>
-                <Mail size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                <Mail size={17} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="doctor@clinic.com"
-                  style={{
-                    width: '100%', boxSizing: 'border-box',
-                    padding: '11px 12px 11px 40px',
-                    border: '1.5px solid #e5e7eb', borderRadius: '10px',
-                    fontSize: '0.95rem', color: '#111827',
-                    outline: 'none', transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#16a34a'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                  style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = '#16a34a'; e.target.style.background = '#fff'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#fafafa'; }}
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                Password
-              </label>
+              <label style={labelStyle}>Password</label>
               <div style={{ position: 'relative' }}>
-                <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                <Lock size={17} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  style={{
-                    width: '100%', boxSizing: 'border-box',
-                    padding: '11px 40px 11px 40px',
-                    border: '1.5px solid #e5e7eb', borderRadius: '10px',
-                    fontSize: '0.95rem', color: '#111827',
-                    outline: 'none', transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#16a34a'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                  style={{ ...inputStyle, paddingRight: '44px' }}
+                  onFocus={(e) => { e.target.style.borderColor = '#16a34a'; e.target.style.background = '#fff'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#fafafa'; }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0,
+                    background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px',
                   }}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
             </div>
 
-            {/* Sign In Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
               style={{
-                background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                background: loading ? '#86efac' : 'linear-gradient(135deg, #16a34a, #15803d)',
                 color: 'white', border: 'none', borderRadius: '10px',
-                padding: '12px', fontSize: '1rem', fontWeight: 600,
+                padding: '13px', fontSize: '0.95rem', fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.8 : 1,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                marginTop: '4px',
+                marginTop: '4px', fontFamily: FONT,
+                boxShadow: loading ? 'none' : '0 4px 14px rgba(22,163,74,0.35)',
+                transition: 'all 0.2s',
+                letterSpacing: '0.01em',
               }}
             >
-              {loading ? <><Loader2 size={18} className="animate-spin" /> Signing in...</> : 'Sign In'}
+              {loading ? <><Loader2 size={17} className="animate-spin" /> Signing in...</> : 'Sign In'}
             </button>
           </form>
 
           {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '22px 0' }}>
             <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
-            <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>or continue with</span>
+            <span style={{ fontSize: '0.78rem', color: '#9ca3af', fontFamily: FONT }}>or continue with</span>
             <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
           </div>
 
-          {/* Google Sign In */}
+          {/* Google */}
           <button
             onClick={handleGoogleLogin}
             style={{
-              width: '100%', padding: '11px',
-              border: `1.5px solid ${googleLoading ? '#86efac' : '#e5e7eb'}`, borderRadius: '10px',
-              background: googleLoading ? '#f0fdf4' : 'white', cursor: 'pointer',
+              width: '100%', padding: '12px',
+              border: `1.5px solid ${googleLoading ? '#86efac' : '#e5e7eb'}`,
+              borderRadius: '10px',
+              background: googleLoading ? '#f0fdf4' : 'white',
+              cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-              fontSize: '0.95rem', fontWeight: 600, color: '#374151',
+              fontSize: '0.925rem', fontWeight: 600, color: '#374151',
+              fontFamily: FONT,
               transition: 'border-color 0.2s, box-shadow 0.2s',
             }}
             onMouseEnter={(e) => { if (!googleLoading) { e.currentTarget.style.borderColor = '#16a34a'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.1)'; } }}
@@ -229,9 +282,9 @@ export default function Login() {
           >
             {googleLoading ? (
               <>
-                <Loader2 size={18} className="animate-spin" color="#16a34a" />
+                <Loader2 size={17} className="animate-spin" color="#16a34a" />
                 <span style={{ color: '#16a34a' }}>Opening Google…</span>
-                <span style={{ fontSize: '0.78rem', color: '#9ca3af', marginLeft: 4 }}>(click to cancel)</span>
+                <span style={{ fontSize: '0.78rem', color: '#9ca3af', marginLeft: 2 }}>(click to cancel)</span>
               </>
             ) : (
               <>
@@ -246,9 +299,9 @@ export default function Login() {
             )}
           </button>
 
-          <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#6b7280', marginTop: '20px' }}>
+          <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#6b7280', marginTop: '24px', fontFamily: FONT }}>
             New staff member?{' '}
-            <Link to="/signup" style={{ color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>Create an account</Link>
+            <Link to="/signup" style={{ color: '#16a34a', fontWeight: 700, textDecoration: 'none' }}>Create an account</Link>
           </p>
         </div>
       </div>
@@ -265,11 +318,11 @@ function friendlyError(code) {
     'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
     'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
     'auth/network-request-failed': 'Network error. Check your internet connection.',
-    'auth/unauthorized-domain': 'This domain is not authorized in Firebase. Go to Firebase Console → Authentication → Settings → Authorized Domains and add your Vercel URL.',
+    'auth/unauthorized-domain': 'This domain is not authorized in Firebase. Go to Firebase Console → Authentication → Settings → Authorized Domains.',
     'auth/operation-not-allowed': 'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in methods.',
     'auth/popup-blocked': 'Popup was blocked by the browser. Please allow popups for this site.',
     'auth/cancelled-popup-request': 'Google sign-in was cancelled.',
-    'auth/internal-error': 'Firebase internal error. Check that your Firebase environment variables are correct in Vercel.',
+    'auth/internal-error': 'Firebase internal error. Check that your Firebase environment variables are correct.',
   };
   return map[code] || `Sign-in failed (${code || 'unknown'}). Please try again.`;
 }

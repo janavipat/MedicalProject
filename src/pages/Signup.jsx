@@ -77,7 +77,7 @@ export default function Signup() {
         <div style={{ background: 'linear-gradient(135deg, #16a34a, #059669)', padding: '28px 40px 24px', textAlign: 'center' }}>
           <div style={{ width: '52px', height: '52px', background: 'rgba(255,255,255,0.2)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '24px' }}>🌿</div>
           <h1 style={{ color: 'white', margin: 0, fontSize: '1.4rem', fontWeight: 700 }}>Create Staff Account</h1>
-          <p style={{ color: 'rgba(255,255,255,0.85)', margin: '4px 0 0', fontSize: '0.85rem' }}>AyurClinic — Authorized staff registration</p>
+          <p style={{ color: 'rgba(255,255,255,0.85)', margin: '4px 0 0', fontSize: '0.85rem' }}>Apollo Clinic — Authorized staff registration</p>
         </div>
 
         <div style={{ padding: '28px 36px 32px' }}>

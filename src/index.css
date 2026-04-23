@@ -49,9 +49,12 @@ a {
   text-decoration: none;
 }
 
+button, input, select, textarea {
+  font-family: var(--font-primary);
+}
+
 button {
   cursor: pointer;
-  font-family: var(--font-primary);
   border: none;
   background: none;
   font-size: 0.95rem;

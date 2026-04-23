@@ -136,7 +136,6 @@ export default function Dashboard() {
       if (!r.ok) throw new Error();
       setStats(await r.json());
     } catch {
-      setError('Backend not connected. Start the backend server to see live data.');
       setStats(null);
     } finally { setLoadingStats(false); }
   }, [authFetch]);
@@ -411,15 +410,15 @@ export default function Dashboard() {
               </p>
             </div>
             <span style={{ fontSize: '0.72rem', background: 'var(--bg-muted)', color: 'var(--text-muted)', padding: '3px 10px', borderRadius: '20px', fontWeight: 600, border: '1px solid var(--border-color)' }}>
-              {loadingQueue ? '…' : `${filteredQueue.length} / ${queue.length} shown`}
+              {loadingQueue ? '…' : `${Math.min(filteredQueue.length, 5)} / ${queue.length} shown`}
             </span>
           </div>
 
           {/* Status summary badges */}
           <StatusSummary queue={queue} loading={loadingQueue} />
 
-          {/* Queue list */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* Queue list — shows first 5, scrollable */}
+          <div style={{ overflowY: 'auto', maxHeight: '340px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {loadingQueue ? (
               <MedicalLoader text="Loading queue…" />
             ) : filteredQueue.length === 0 ? (
@@ -429,7 +428,7 @@ export default function Dashboard() {
                 {hasFilter && <div style={{ fontSize: '0.78rem', marginTop: '4px' }}>Try clearing the filters</div>}
               </div>
             ) : (
-              filteredQueue.map((p, i) => {
+              filteredQueue.slice(0, 5).map((p, i) => {
                 const sc = getStatus(p.status);
                 return (
                   <div key={p._id || p.id || i} style={{
