@@ -56,48 +56,51 @@ export default function Patients() {
   );
 
   return (
-    <div className="animate-fade-in" style={{ padding: '20px' }}>
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <div>
-          <h1 className="page-title">Patient Resources</h1>
-          <p className="page-subtitle">Manage patient records and medical histories</p>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchPatients}>
-            <RefreshCw size={15} />
-          </button>
-          <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => navigate('/prescription')}>
-            <Plus size={18} /> Register New Patient
-          </button>
-        </div>
-      </div>
+    <div className="animate-fade-in">
 
-      {error && (
-        <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', padding: '10px 16px', marginBottom: '16px', fontSize: '0.84rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          ⚠️ {error}
+      {/* Sticky top: page header + search */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--bg-dark)', paddingTop: '24px', paddingBottom: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h1 className="page-title">Patient Resources</h1>
+            <p className="page-subtitle">Manage patient records and medical histories</p>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchPatients}>
+              <RefreshCw size={15} />
+            </button>
+            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => navigate('/prescription')}>
+              <Plus size={18} /> Register New Patient
+            </button>
+          </div>
         </div>
-      )}
 
-      <div className="glass-panel">
-        {/* Search bar */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
-          <div className="input-field" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-muted)', paddingLeft: '16px', position: 'relative' }}>
-            <Search size={20} color="var(--text-muted)" style={{ marginRight: '10px', flexShrink: 0 }} />
+        <div className="glass-panel" style={{ padding: '12px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Search size={18} color="var(--text-muted)" />
             <input
               type="text"
               placeholder="Search patients by name or phone..."
-              style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none', padding: '12px 0' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none', fontSize: '0.9rem' }}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-              <button onClick={() => setSearchTerm('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '0 12px' }}>
+              <button onClick={() => setSearchTerm('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}>
                 <X size={16} />
               </button>
             )}
           </div>
         </div>
+      </div>
 
+      {error && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', padding: '10px 16px', margin: '12px 0', fontSize: '0.84rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          ⚠️ {error}
+        </div>
+      )}
+
+      <div className="glass-panel" style={{ marginTop: '16px' }}>
         {/* Table */}
         <div className="table-container">
           <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Pill, AlertTriangle, Search, PlusCircle, ArrowDown, ArrowUp, Loader2, RefreshCw, X, Save, IndianRupee } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import MedicalLoader from '../components/MedicalLoader.jsx';
@@ -44,8 +44,8 @@ function AddMedicineModal({ onClose, onSaved }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel" style={{ width: '520px', padding: 0, borderRadius: '20px', overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div className="glass-panel" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', padding: 0, borderRadius: '20px' }}>
 
         {/* Modal header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)' }}>
@@ -135,6 +135,13 @@ export default function Inventory() {
   const [search, setSearch]       = useState('');
   const [showAdd, setShowAdd]     = useState(false);
   const [consumingId, setConsumingId] = useState(null);
+
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    const el = document.querySelector('.main-content');
+    if (el) el.style.overflow = showAdd ? 'hidden' : '';
+    return () => { if (el) el.style.overflow = ''; };
+  }, [showAdd]);
 
   const fetchInventory = useCallback(async () => {
     setLoading(true);

@@ -440,6 +440,13 @@ export default function DiseaseManager() {
 
   useEffect(() => { fetchDiseases(); }, [fetchDiseases]);
 
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    const el = document.querySelector('.main-content');
+    if (el) el.style.overflow = showModal ? 'hidden' : '';
+    return () => { if (el) el.style.overflow = ''; };
+  }, [showModal]);
+
   const filtered = diseases.filter(d =>
     d.name?.toLowerCase().includes(search.toLowerCase()) ||
     d.localName?.toLowerCase().includes(search.toLowerCase()) ||
