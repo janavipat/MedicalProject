@@ -179,87 +179,91 @@ function DiseaseModal({ disease, onClose, onSave }) {
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
-      backdropFilter: 'blur(6px)', zIndex: 999,
+      position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.65)',
+      backdropFilter: 'blur(8px)', zIndex: 999,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
     }}>
-      <div className="glass-panel" style={{
-        width: '660px', maxHeight: '90vh', padding: 0, borderRadius: '20px',
+      <div style={{
+        width: '680px', maxHeight: '90vh', background: 'white', borderRadius: '16px',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
 
-        {/* Fixed Header */}
+        {/* Top accent bar */}
+        <div style={{ height: '4px', background: 'linear-gradient(90deg, #16a34a, #22c55e)', flexShrink: 0 }} />
+
+        {/* Header */}
         <div style={{
           flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '20px 24px', background: 'var(--bg-muted)',
-          borderBottom: '1px solid var(--border-color)', borderRadius: '20px 20px 0 0',
+          padding: '20px 28px', background: 'white', borderBottom: '1px solid #f1f5f9',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Stethoscope size={18} color="#16a34a" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>
+              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
                 {disease ? 'Edit Disease Protocol' : 'Add New Disease Protocol'}
               </h2>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>
                 {disease ? 'Update Ayurvedic treatment protocol' : 'Define medicines, pathya and apathya'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'white'}
           ><X size={16} /></button>
         </div>
 
         {/* Scrollable Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
 
-          {/* Section 1 — Basic Info */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <BookOpen size={11} /> Basic Information
+          {/* Group: DISEASE IDENTITY */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Disease Identity
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Disease Name (Ayurvedic) <span style={{ color: '#ef4444' }}>*</span></label>
+              <input className="input-field" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Amlapitta" autoFocus />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Local / Common Name</label>
+              <input className="input-field" value={form.localName} onChange={e => set('localName', e.target.value)} placeholder="e.g. Hyperacidity / GERD" />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Disease Name (Ayurvedic) <span style={{ color: '#ef4444' }}>*</span></label>
-                <input className="input-field" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Amlapitta" autoFocus />
+                <label className="input-label">System / Type</label>
+                <input className="input-field" value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Digestive, Respiratory" />
               </div>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Local / Common Name</label>
-                <input className="input-field" value={form.localName} onChange={e => set('localName', e.target.value)} placeholder="e.g. Hyperacidity / GERD" />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">System / Type</label>
-                  <input className="input-field" value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Digestive, Respiratory" />
-                </div>
-                <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label">Main Dosha</label>
-                  <select className="input-field" value={form.mainDosha} onChange={e => set('mainDosha', e.target.value)} style={{ appearance: 'auto' }}>
-                    <option value="">Select Dosha</option>
-                    {['Vata', 'Pitta', 'Kapha', 'Vata-Pitta', 'Kapha-Vata', 'Pitta-Kapha', 'Tridosha'].map(d => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                  {form.mainDosha && (
-                    <div style={{ marginTop: '6px' }}>
-                      <span style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: ds.bg, color: ds.color }}>{form.mainDosha}</span>
-                    </div>
-                  )}
-                </div>
+                <label className="input-label">Main Dosha</label>
+                <select className="input-field" value={form.mainDosha} onChange={e => set('mainDosha', e.target.value)} style={{ appearance: 'auto' }}>
+                  <option value="">Select Dosha</option>
+                  {['Vata', 'Pitta', 'Kapha', 'Vata-Pitta', 'Kapha-Vata', 'Pitta-Kapha', 'Tridosha'].map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                {form.mainDosha && (
+                  <div style={{ marginTop: '6px' }}>
+                    <span style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: ds.bg, color: ds.color }}>{form.mainDosha}</span>
+                  </div>
+                )}
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* Section 2 — Medicines */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #059669' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Pill size={11} /> Standard Medicines (from Inventory)
-            </div>
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
+
+          {/* Group: STANDARD MEDICINES */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Standard Medicines
+          </div>
+          <div style={{ marginBottom: '24px' }}>
             <div style={{ position: 'relative', marginBottom: '10px' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div style={{ flex: 1, position: 'relative' }}>
@@ -276,7 +280,7 @@ function DiseaseModal({ disease, onClose, onSave }) {
                   {showMedSug && medSuggestions.length > 0 && (
                     <div style={{
                       position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 300,
-                      background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+                      background: 'white', border: '1px solid #e2e8f0',
                       borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                       marginTop: '4px', maxHeight: '180px', overflowY: 'auto',
                     }}>
@@ -291,9 +295,9 @@ function DiseaseModal({ disease, onClose, onSave }) {
                             style={{
                               padding: '9px 14px', cursor: alreadyAdded ? 'default' : 'pointer',
                               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                              borderBottom: '1px solid var(--border-color)', opacity: alreadyAdded ? 0.5 : 1,
+                              borderBottom: '1px solid #f1f5f9', opacity: alreadyAdded ? 0.5 : 1,
                             }}
-                            onMouseEnter={e => !alreadyAdded && (e.currentTarget.style.background = 'var(--bg-muted)')}
+                            onMouseEnter={e => !alreadyAdded && (e.currentTarget.style.background = '#f8fafc')}
                             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                           >
                             <div>
@@ -301,7 +305,7 @@ function DiseaseModal({ disease, onClose, onSave }) {
                                 {s.medicineName}
                                 {alreadyAdded && <span style={{ fontSize: '0.7rem', color: '#16a34a', background: 'rgba(22,163,74,0.1)', padding: '1px 6px', borderRadius: '8px' }}>Added</span>}
                               </div>
-                              {s.formulation && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1px' }}>{s.formulation}{s.brand ? ` · ${s.brand}` : ''}</div>}
+                              {s.formulation && <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '1px' }}>{s.formulation}{s.brand ? ` · ${s.brand}` : ''}</div>}
                             </div>
                             <span style={{ fontSize: '0.7rem', color: stockColor, background: `${stockColor}18`, padding: '2px 8px', borderRadius: '10px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                               {qty === 0 ? 'Out' : `${qty} left`}
@@ -316,12 +320,12 @@ function DiseaseModal({ disease, onClose, onSave }) {
                   <Plus size={15} /> Add
                 </button>
               </div>
-              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '6px 0 0' }}>
+              <p style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '6px 0 0' }}>
                 Type to search from inventory · Press Enter or click Add to add manually
               </p>
             </div>
             {form.commonMedicines.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 {form.commonMedicines.map(m => (
                   <span key={m} style={{ padding: '5px 12px', background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.25)', borderRadius: '20px', fontSize: '0.8rem', color: '#16a34a', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Pill size={11} /> {m}
@@ -332,26 +336,28 @@ function DiseaseModal({ disease, onClose, onSave }) {
                 ))}
               </div>
             )}
-          </section>
+          </div>
 
-          {/* Section 3 — Pathya / Apathya */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <section style={{ background: '#f0fdf4', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #16a34a' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Check size={11} /> Pathya — Do's
-              </div>
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
+
+          {/* Group: DIETARY GUIDELINES */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Dietary Guidelines
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+            <div style={{ borderLeft: '2px solid #bbf7d0', padding: '12px', borderRadius: '8px', background: '#f0fdf4' }}>
+              <label className="input-label" style={{ display: 'block', marginBottom: '8px' }}>✓ Pathya — Do's</label>
               <textarea className="input-field" rows={4} value={form.pathya} onChange={e => set('pathya', e.target.value)}
                 placeholder="e.g. Light easily digestible food, rest..."
-                style={{ resize: 'vertical', borderColor: 'rgba(22,163,74,0.25)', background: 'white', marginBottom: 0 }} />
-            </section>
-            <section style={{ background: '#fef2f2', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #dc2626' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <X size={11} /> Apathya — Don'ts
-              </div>
+                style={{ resize: 'vertical', marginBottom: 0 }} />
+            </div>
+            <div style={{ borderLeft: '2px solid #fecaca', padding: '12px', borderRadius: '8px', background: '#fef2f2' }}>
+              <label className="input-label" style={{ display: 'block', marginBottom: '8px' }}>✗ Apathya — Don'ts</label>
               <textarea className="input-field" rows={4} value={form.apathya} onChange={e => set('apathya', e.target.value)}
                 placeholder="e.g. Spicy food, heavy meals, cold drinks..."
-                style={{ resize: 'vertical', borderColor: 'rgba(220,38,38,0.2)', background: 'white', marginBottom: 0 }} />
-            </section>
+                style={{ resize: 'vertical', marginBottom: 0 }} />
+            </div>
           </div>
 
           {/* Error */}
@@ -363,16 +369,20 @@ function DiseaseModal({ disease, onClose, onSave }) {
 
         </div>
 
-        {/* Fixed Footer — Save button always visible */}
-        <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '12px' }}>
+        {/* Footer */}
+        <div style={{ flexShrink: 0, padding: '16px 28px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', gap: '12px' }}>
           <button
-            className="btn btn-primary"
-            style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+            onClick={onClose}
+            style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', color: '#374151', fontWeight: 500, cursor: 'pointer', fontSize: '0.88rem' }}
+          >
+            Cancel
+          </button>
+          <button
             onClick={handleSave} disabled={saving}
+            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #16a34a, #15803d)', color: 'white', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(22,163,74,0.25)', cursor: 'pointer' }}
           >
             {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> {disease ? 'Update Protocol' : 'Save Protocol'}</>}
           </button>
-          <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '100px' }}>Cancel</button>
         </div>
 
       </div>

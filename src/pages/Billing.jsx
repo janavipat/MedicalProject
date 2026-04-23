@@ -119,36 +119,39 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 999,
+      position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(8px)', zIndex: 999,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
     }}>
-      <div className="glass-panel" style={{ width: '560px', maxHeight: '90vh', padding: 0, borderRadius: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ width: '580px', maxHeight: '90vh', background: 'white', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-        {/* Fixed Header */}
-        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)', borderRadius: '20px 20px 0 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Top accent bar */}
+        <div style={{ height: '4px', background: 'linear-gradient(90deg, #16a34a, #22c55e)', flexShrink: 0 }} />
+
+        {/* Header */}
+        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 28px', background: 'white', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <IndianRupee size={18} color="#16a34a" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Create Receipt</h2>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Generate invoice & record payment for patient</p>
+              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>Create Receipt</h2>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>Generate invoice and record payment</p>
             </div>
           </div>
-          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'white'}
           ><X size={16} /></button>
         </div>
 
         {/* Scrollable Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
 
-          {/* Section 1 — Patient */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <User size={11} /> Patient
-            </div>
+          {/* Group: PATIENT */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Patient
+          </div>
+          <div style={{ marginBottom: '24px' }}>
             <div className="input-group" style={{ position: 'relative', margin: 0 }}>
               <label className="input-label">
                 Patient Name <span style={{ color: 'red' }}>*</span>
@@ -181,11 +184,11 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
                 )}
               </div>
               {patientSuggestions.length > 0 && (
-                <div className="glass-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, maxHeight: '180px', overflowY: 'auto', padding: '4px', marginTop: '2px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, maxHeight: '180px', overflowY: 'auto', padding: '4px', marginTop: '2px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
                   {patientSuggestions.map(p => (
                     <div key={p._id || p.id} onClick={() => selectPatient(p)}
                       style={{ padding: '9px 12px', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-muted)'}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <div>
@@ -205,40 +208,44 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
                 </div>
               )}
             </div>
-          </section>
+          </div>
 
-          {/* Section 2 — Bill Details */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #059669' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <FileText size={11} /> Bill Details
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">Bill Type</label>
-                <select className="input-field" value={billType} onChange={e => setBillType(e.target.value)} style={{ appearance: 'auto' }}>
-                  <option value="Consultation">Consultation</option>
-                  <option value="Medicine">Medicine</option>
-                  <option value="Procedure">Procedure</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">Payment Method</label>
-                <select className="input-field" value={paymentMethod} onChange={e => setPayMethod(e.target.value)} style={{ appearance: 'auto' }}>
-                  <option value="Cash">Cash</option>
-                  <option value="UPI">UPI</option>
-                  <option value="Card">Card</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-          </section>
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
 
-          {/* Section 3 — Line Items */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #f59e0b' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <IndianRupee size={11} /> Line Items
+          {/* Group: BILL DETAILS */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Bill Details
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
+            <div className="input-group" style={{ margin: 0 }}>
+              <label className="input-label">Bill Type</label>
+              <select className="input-field" value={billType} onChange={e => setBillType(e.target.value)} style={{ appearance: 'auto' }}>
+                <option value="Consultation">Consultation</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Procedure">Procedure</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
+            <div className="input-group" style={{ margin: 0 }}>
+              <label className="input-label">Payment Method</label>
+              <select className="input-field" value={paymentMethod} onChange={e => setPayMethod(e.target.value)} style={{ appearance: 'auto' }}>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
+
+          {/* Group: LINE ITEMS */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Line Items
+          </div>
+          <div style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
               {items.map((item, idx) => (
                 <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 36px', gap: '8px', alignItems: 'center' }}>
@@ -270,52 +277,61 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
                 </div>
               ))}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
               <button type="button" className="btn btn-outline" style={{ padding: '5px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={addItem}>
                 <Plus size={13} /> Add Item
               </button>
-              <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--primary)' }}>
+              <div style={{ fontSize: '1rem', fontWeight: 700, color: '#16a34a' }}>
                 Total: {fmt(totalAmount)}
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* Section 4 — Payment Status & Notes */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #8b5cf6' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <CheckCircle size={11} /> Payment & Notes
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
+
+          {/* Group: PAYMENT STATUS */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Payment Status
+          </div>
+          <div
+            onClick={() => setPaidNow(p => !p)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px',
+              borderRadius: '10px', cursor: 'pointer', marginBottom: '24px',
+              background: paidNow ? '#f0fdf4' : 'white',
+              border: `1.5px solid ${paidNow ? '#86efac' : '#e2e8f0'}`,
+              transition: 'all 0.2s',
+            }}
+          >
+            <div style={{
+              width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
+              border: `2px solid ${paidNow ? '#16a34a' : '#d1d5db'}`,
+              background: paidNow ? '#16a34a' : 'white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+            }}>
+              {paidNow && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L5 9.5L10.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" /></svg>}
             </div>
-            <div
-              onClick={() => setPaidNow(p => !p)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px',
-                borderRadius: '10px', cursor: 'pointer', marginBottom: '12px',
-                background: paidNow ? '#f0fdf4' : 'white',
-                border: `1.5px solid ${paidNow ? '#86efac' : 'var(--border-color)'}`,
-                transition: 'all 0.2s',
-              }}
-            >
-              <div style={{
-                width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
-                border: `2px solid ${paidNow ? '#16a34a' : '#d1d5db'}`,
-                background: paidNow ? '#16a34a' : 'white',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
-              }}>
-                {paidNow && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L5 9.5L10.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" /></svg>}
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: paidNow ? '#16a34a' : 'var(--text-main)' }}>
-                {paidNow ? `✓ Paid via ${paymentMethod}` : 'Mark as Paid Now'}
-              </div>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: paidNow ? '#16a34a' : '#374151' }}>
+              {paidNow ? `Mark as Paid Now` : 'Mark as Paid Now'}
+              {paidNow && <span style={{ marginLeft: '8px', fontWeight: 400, color: '#64748b', fontSize: '0.85rem' }}>Paid via {paymentMethod}</span>}
             </div>
-            <div className="input-group" style={{ margin: 0 }}>
-              <label className="input-label">Notes (optional)</label>
-              <textarea
-                className="input-field" rows={2} style={{ resize: 'none', fontSize: '0.85rem' }}
-                placeholder="Any additional notes..."
-                value={notes} onChange={e => setNotes(e.target.value)}
-              />
-            </div>
-          </section>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
+
+          {/* Group: NOTES */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Notes
+          </div>
+          <div className="input-group" style={{ margin: '0 0 24px' }}>
+            <textarea
+              className="input-field" rows={2} style={{ resize: 'none', fontSize: '0.85rem' }}
+              placeholder="Any additional notes..."
+              value={notes} onChange={e => setNotes(e.target.value)}
+            />
+          </div>
 
           {/* Error */}
           {error && (
@@ -326,15 +342,23 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
 
         </div>
 
-        {/* Fixed Footer — always visible */}
-        <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '10px' }}>
-          <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleCreate} disabled={saving}>
+        {/* Footer */}
+        <div style={{ flexShrink: 0, padding: '16px 28px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', gap: '12px' }}>
+          <button
+            onClick={onClose} disabled={saving}
+            style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', color: '#374151', fontWeight: 500, cursor: 'pointer', fontSize: '0.88rem' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreate} disabled={saving}
+            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #16a34a, #15803d)', color: 'white', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(22,163,74,0.25)', cursor: 'pointer' }}
+          >
             {saving
               ? <><Loader2 size={16} className="animate-spin" /> Creating...</>
               : <><IndianRupee size={16} /> Create Receipt</>
             }
           </button>
-          <button className="btn btn-outline" onClick={onClose} disabled={saving} style={{ minWidth: '90px' }}>Cancel</button>
         </div>
 
       </div>

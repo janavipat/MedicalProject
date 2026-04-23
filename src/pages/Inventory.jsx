@@ -44,40 +44,37 @@ function AddMedicineModal({ onClose, onSaved }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel" style={{ width: '520px', maxHeight: '90vh', padding: 0, borderRadius: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(8px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ width: '520px', maxHeight: '90vh', background: 'white', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-        {/* Fixed Header */}
-        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)', borderRadius: '20px 20px 0 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Top accent bar */}
+        <div style={{ height: '4px', background: 'linear-gradient(90deg, #16a34a, #22c55e)', flexShrink: 0 }} />
+
+        {/* Header */}
+        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 28px', background: 'white', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Pill size={18} color="#16a34a" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Add New Medicine</h2>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Add to inventory for tracking & prescriptions</p>
+              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>Add New Medicine</h2>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>Add to inventory for tracking & prescriptions</p>
             </div>
           </div>
-          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'white'}
           ><X size={16} /></button>
         </div>
 
         {/* Scrollable Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
 
-          {error && (
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', fontSize: '0.85rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertTriangle size={15} /> {error}
-            </div>
-          )}
-
-          {/* Section 1 — Medicine Identity */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Pill size={11} /> Medicine Identity
-            </div>
+          {/* Group: MEDICINE DETAILS */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Medicine Details
+          </div>
+          <div style={{ marginBottom: '24px' }}>
             <div className="input-group" style={{ marginBottom: '12px' }}>
               <label className="input-label">Medicine Name <span style={{ color: '#ef4444' }}>*</span></label>
               <input className="input-field" value={form.medicineName} onChange={e => set('medicineName', e.target.value)} placeholder="e.g. Triphala Churna" autoFocus style={{ marginBottom: 0 }} />
@@ -92,50 +89,67 @@ function AddMedicineModal({ onClose, onSaved }) {
                 <input className="input-field" value={form.formulation} onChange={e => set('formulation', e.target.value)} placeholder="e.g. Churna, Vati" />
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* Section 2 — Stock & Pricing */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #f59e0b' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <IndianRupee size={11} /> Stock & Pricing
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Stock Quantity <span style={{ color: '#ef4444' }}>*</span></label>
-                <input className="input-field" type="number" min="0" value={form.stockQuantity} onChange={e => set('stockQuantity', e.target.value)} placeholder="0" />
-              </div>
-              <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Price (₹) <span style={{ color: '#ef4444' }}>*</span></label>
-                <input className="input-field" type="number" min="0" value={form.price} onChange={e => set('price', e.target.value)} placeholder="0" />
-              </div>
-            </div>
-          </section>
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
 
-          {/* Section 3 — Expiry & Alerts */}
-          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #8b5cf6' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <AlertTriangle size={11} /> Expiry & Alerts
+          {/* Group: STOCK & PRICING */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Stock & Pricing
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Stock Quantity <span style={{ color: '#ef4444' }}>*</span></label>
+              <input className="input-field" type="number" min="0" value={form.stockQuantity} onChange={e => set('stockQuantity', e.target.value)} placeholder="0" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Expiry Date</label>
-                <input className="input-field" type="date" value={form.expiryDate} onChange={e => set('expiryDate', e.target.value)} />
-              </div>
-              <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Low Stock Alert Level</label>
-                <input className="input-field" type="number" min="1" value={form.lowStockThreshold} onChange={e => set('lowStockThreshold', e.target.value)} />
-              </div>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Price (₹) <span style={{ color: '#ef4444' }}>*</span></label>
+              <input className="input-field" type="number" min="0" value={form.price} onChange={e => set('price', e.target.value)} placeholder="0" />
             </div>
-          </section>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: '1px', background: '#f1f5f9', margin: '0 0 24px' }} />
+
+          {/* Group: EXPIRY & ALERTS */}
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px' }}>
+            Expiry & Alerts
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: error ? '24px' : 0 }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Expiry Date</label>
+              <input className="input-field" type="date" value={form.expiryDate} onChange={e => set('expiryDate', e.target.value)} />
+            </div>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Low Stock Alert Level</label>
+              <input className="input-field" type="number" min="1" value={form.lowStockThreshold} onChange={e => set('lowStockThreshold', e.target.value)} />
+            </div>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', fontSize: '0.85rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={15} /> {error}
+            </div>
+          )}
 
         </div>
 
-        {/* Fixed Footer — always visible */}
-        <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '12px' }}>
-          <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleSave} disabled={saving}>
+        {/* Footer */}
+        <div style={{ flexShrink: 0, padding: '16px 28px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', gap: '12px' }}>
+          <button
+            onClick={onClose}
+            style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', color: '#374151', fontWeight: 500, cursor: 'pointer', fontSize: '0.88rem' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave} disabled={saving}
+            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #16a34a, #15803d)', color: 'white', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(22,163,74,0.25)', cursor: 'pointer' }}
+          >
             {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> Add Medicine</>}
           </button>
-          <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '90px' }}>Cancel</button>
         </div>
       </div>
     </div>
