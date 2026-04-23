@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Mail, Lock, Eye, EyeOff, Loader2, User, Stethoscope, ClipboardList } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, User, Stethoscope, ClipboardList, Activity, Shield, Heart } from 'lucide-react';
+
+const FONT = "'Inter', system-ui, sans-serif";
 
 const ROLES = [
   {
@@ -53,85 +55,181 @@ export default function Signup() {
   };
 
   const inputStyle = {
-    width: '100%', boxSizing: 'border-box',
-    padding: '11px 12px 11px 40px',
-    border: '1.5px solid #e5e7eb', borderRadius: '10px',
-    fontSize: '0.95rem', color: '#111827',
-    outline: 'none', transition: 'border-color 0.2s',
-    background: 'white',
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '12px 12px 12px 42px',
+    border: '1.5px solid #e5e7eb',
+    borderRadius: '10px',
+    fontSize: '0.925rem',
+    color: '#111827',
+    outline: 'none',
+    fontFamily: FONT,
+    background: '#fafafa',
+    transition: 'border-color 0.2s, background 0.2s',
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    color: '#374151',
+    marginBottom: '6px',
+    fontFamily: FONT,
+    letterSpacing: '0.02em',
+    textTransform: 'uppercase',
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '20px',
-    }}>
-      <div style={{
-        background: 'white', borderRadius: '20px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
-        width: '100%', maxWidth: '480px', overflow: 'hidden',
-      }}>
-        {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg, #16a34a, #059669)', padding: '28px 40px 24px', textAlign: 'center' }}>
-          <div style={{ width: '52px', height: '52px', background: 'rgba(255,255,255,0.2)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '24px' }}>🌿</div>
-          <h1 style={{ color: 'white', margin: 0, fontSize: '1.4rem', fontWeight: 700 }}>Create Staff Account</h1>
-          <p style={{ color: 'rgba(255,255,255,0.85)', margin: '4px 0 0', fontSize: '0.85rem' }}>Apollo Clinic — Authorized staff registration</p>
-        </div>
+    <div style={{ minHeight: '100vh', display: 'flex', fontFamily: FONT }}>
 
-        <div style={{ padding: '28px 36px 32px' }}>
+      {/* Left branding panel */}
+      <div style={{
+        flex: '0 0 42%',
+        background: 'linear-gradient(160deg, #16a34a 0%, #0f5f30 60%, #064e25 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '60px 48px',
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '240px', height: '240px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{
+            width: '80px', height: '80px',
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '22px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '28px',
+            border: '1.5px solid rgba(255,255,255,0.2)',
+          }}>
+            <Activity size={38} color="white" strokeWidth={1.8} />
+          </div>
+
+          <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', textAlign: 'center' }}>
+            Apollo Clinic
+          </h1>
+          <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: '1.6', margin: '0 0 48px', maxWidth: '260px' }}>
+            Join our team and help deliver world-class healthcare
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%', maxWidth: '260px' }}>
+            {[
+              { icon: Stethoscope, text: 'Doctor — Clinical access & prescriptions' },
+              { icon: ClipboardList, text: 'Receptionist — Appointments & records' },
+              { icon: Shield, text: 'Secure role-based access control' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: '36px', height: '36px', flexShrink: 0,
+                  background: 'rgba(255,255,255,0.12)',
+                  borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={17} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+                </div>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.4' }}>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <div style={{
+        flex: 1,
+        background: '#f8faf9',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 32px',
+        overflowY: 'auto',
+      }}>
+        <div style={{ width: '100%', maxWidth: '420px' }}>
+
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', margin: '0 0 6px', letterSpacing: '-0.03em' }}>
+            Create Staff Account
+          </h2>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0 0 28px' }}>
+            Register as Apollo Clinic staff
+          </p>
+
           {error && (
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: '8px', padding: '10px 14px', marginBottom: '18px', fontSize: '0.85rem' }}>
+            <div style={{
+              background: '#fef2f2', border: '1px solid #fecaca',
+              color: '#dc2626', borderRadius: '10px',
+              padding: '10px 14px', marginBottom: '20px',
+              fontSize: '0.875rem', fontFamily: FONT,
+            }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
             {/* Full Name */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '5px' }}>Full Name</label>
+              <label style={labelStyle}>Full Name</label>
               <div style={{ position: 'relative' }}>
-                <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                <input type="text" required value={form.name} onChange={update('name')} placeholder="Enter your full name" style={inputStyle}
-                  onFocus={(e) => e.target.style.borderColor = '#16a34a'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
+                <User size={17} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                <input
+                  type="text" required value={form.name} onChange={update('name')}
+                  placeholder="Enter your full name" style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = '#16a34a'; e.target.style.background = '#fff'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#fafafa'; }}
+                />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '5px' }}>Email Address</label>
+              <label style={labelStyle}>Email Address</label>
               <div style={{ position: 'relative' }}>
-                <Mail size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                <input type="email" required value={form.email} onChange={update('email')} placeholder="doctor@clinic.com" style={inputStyle}
-                  onFocus={(e) => e.target.style.borderColor = '#16a34a'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
+                <Mail size={17} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                <input
+                  type="email" required value={form.email} onChange={update('email')}
+                  placeholder="doctor@clinic.com" style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = '#16a34a'; e.target.style.background = '#fff'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#fafafa'; }}
+                />
               </div>
             </div>
 
             {/* Password + Confirm */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '5px' }}>Password</label>
+                <label style={labelStyle}>Password</label>
                 <div style={{ position: 'relative' }}>
-                  <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input type={showPassword ? 'text' : 'password'} required value={form.password} onChange={update('password')} placeholder="Min 6 chars" style={{ ...inputStyle, paddingRight: '36px' }}
-                    onFocus={(e) => e.target.style.borderColor = '#16a34a'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}>
+                  <Lock size={17} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                  <input
+                    type={showPassword ? 'text' : 'password'} required value={form.password} onChange={update('password')}
+                    placeholder="Min 6 chars" style={{ ...inputStyle, paddingRight: '40px' }}
+                    onFocus={(e) => { e.target.style.borderColor = '#16a34a'; e.target.style.background = '#fff'; }}
+                    onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#fafafa'; }}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px' }}>
                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '5px' }}>Confirm</label>
+                <label style={labelStyle}>Confirm</label>
                 <div style={{ position: 'relative' }}>
-                  <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input type={showConfirm ? 'text' : 'password'} required value={form.confirm} onChange={update('confirm')} placeholder="Re-enter" style={{ ...inputStyle, paddingRight: '36px' }}
-                    onFocus={(e) => e.target.style.borderColor = '#16a34a'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}>
+                  <Lock size={17} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                  <input
+                    type={showConfirm ? 'text' : 'password'} required value={form.confirm} onChange={update('confirm')}
+                    placeholder="Re-enter" style={{ ...inputStyle, paddingRight: '40px' }}
+                    onFocus={(e) => { e.target.style.borderColor = '#16a34a'; e.target.style.background = '#fff'; }}
+                    onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#fafafa'; }}
+                  />
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px' }}>
                     {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
@@ -140,7 +238,7 @@ export default function Signup() {
 
             {/* Role Selection */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Select Role</label>
+              <label style={labelStyle}>Select Role</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {ROLES.map(({ value, label, desc, icon: Icon, color }) => (
                   <label key={value} style={{
@@ -150,17 +248,28 @@ export default function Signup() {
                     background: selectedRole === value ? `${color}12` : 'white',
                     transition: 'all 0.15s',
                   }}>
-                    <input type="radio" name="role" value={value} checked={selectedRole === value} onChange={() => setSelectedRole(value)} style={{ display: 'none' }} />
-                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: selectedRole === value ? color : '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
+                    <input type="radio" name="role" value={value} checked={selectedRole === value}
+                      onChange={() => setSelectedRole(value)} style={{ display: 'none' }} />
+                    <div style={{
+                      width: '36px', height: '36px', borderRadius: '8px', flexShrink: 0,
+                      background: selectedRole === value ? color : '#f3f4f6',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s',
+                    }}>
                       <Icon size={18} color={selectedRole === value ? '#fff' : '#6b7280'} />
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: selectedRole === value ? color : '#111827' }}>{label}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '1px' }}>{desc}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: selectedRole === value ? color : '#111827', fontFamily: FONT }}>{label}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '1px', fontFamily: FONT }}>{desc}</div>
                     </div>
                     {selectedRole === value && (
-                      <div style={{ marginLeft: 'auto', width: '18px', height: '18px', borderRadius: '50%', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" /></svg>
+                      <div style={{
+                        width: '20px', height: '20px', borderRadius: '50%', background: color, flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 10 10">
+                          <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                        </svg>
                       </div>
                     )}
                   </label>
@@ -169,22 +278,28 @@ export default function Signup() {
             </div>
 
             {/* Submit */}
-            <button type="submit" disabled={loading} style={{
-              background: 'linear-gradient(135deg, #16a34a, #15803d)',
-              color: 'white', border: 'none', borderRadius: '10px',
-              padding: '12px', fontSize: '1rem', fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.8 : 1,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              marginTop: '4px',
-            }}>
-              {loading ? <><Loader2 size={18} className="animate-spin" /> Creating account...</> : 'Create Account'}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                background: loading ? '#86efac' : 'linear-gradient(135deg, #16a34a, #15803d)',
+                color: 'white', border: 'none', borderRadius: '10px',
+                padding: '13px', fontSize: '0.95rem', fontWeight: 700,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                marginTop: '4px', fontFamily: FONT,
+                boxShadow: loading ? 'none' : '0 4px 14px rgba(22,163,74,0.35)',
+                transition: 'all 0.2s',
+                letterSpacing: '0.01em',
+              }}
+            >
+              {loading ? <><Loader2 size={17} className="animate-spin" /> Creating account...</> : 'Create Account'}
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: '18px', fontSize: '0.875rem', color: '#6b7280' }}>
+          <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '0.875rem', color: '#6b7280', fontFamily: FONT }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+            <Link to="/login" style={{ color: '#16a34a', fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
           </p>
         </div>
       </div>
