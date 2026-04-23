@@ -102,13 +102,13 @@ export default function Patients() {
 
       <div className="glass-panel" style={{ marginTop: '16px' }}>
         {/* Table */}
-        <div className="table-container">
+        <div className="table-container" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 260px)' }}>
           <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'var(--bg-card)' }}>
               <tr>
-                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Patient Info</th>
-                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Contact</th>
-                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)' }}>Actions</th>
+                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>Patient Info</th>
+                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>Contact</th>
+                <th style={{ textAlign: 'left', padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

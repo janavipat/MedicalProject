@@ -115,41 +115,43 @@ function DoctorView() {
 
   return (
     <div className="animate-fade-in">
-      {/* ── Header Row ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h1 className="page-title">Appointments</h1>
-          <p className="page-subtitle">{weekLabel} &nbsp;•&nbsp; {totalShown} appointment{totalShown !== 1 ? 's' : ''}</p>
+      {/* ── Sticky Header: title + week nav + filter bar ── */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--bg-dark)', paddingTop: '24px', paddingBottom: '12px' }}>
+        {/* Header Row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <h1 className="page-title">Appointments</h1>
+            <p className="page-subtitle">{weekLabel} &nbsp;•&nbsp; {totalShown} appointment{totalShown !== 1 ? 's' : ''}</p>
+          </div>
+
+          {/* Week navigation */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button className="btn btn-outline" style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }} onClick={prevWeek}>
+              <ChevronLeft size={16} /> Prev Week
+            </button>
+            <button
+              onClick={goThisWeek}
+              style={{
+                padding: '8px 16px', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                border: `2px solid ${isThisWeek ? 'var(--primary)' : 'var(--border-color)'}`,
+                background: isThisWeek ? 'var(--primary)' : 'white',
+                color: isThisWeek ? 'white' : 'var(--text-main)',
+                transition: 'all 0.2s',
+              }}
+            >
+              This Week
+            </button>
+            <button className="btn btn-outline" style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }} onClick={nextWeek}>
+              Next Week <ChevronRight size={16} />
+            </button>
+            <button className="btn btn-outline" style={{ padding: '8px 10px', display: 'flex' }} onClick={fetchAppointments} title="Refresh">
+              <RefreshCw size={15} />
+            </button>
+          </div>
         </div>
 
-        {/* Week navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button className="btn btn-outline" style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }} onClick={prevWeek}>
-            <ChevronLeft size={16} /> Prev Week
-          </button>
-          <button
-            onClick={goThisWeek}
-            style={{
-              padding: '8px 16px', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
-              border: `2px solid ${isThisWeek ? 'var(--primary)' : 'var(--border-color)'}`,
-              background: isThisWeek ? 'var(--primary)' : 'white',
-              color: isThisWeek ? 'white' : 'var(--text-main)',
-              transition: 'all 0.2s',
-            }}
-          >
-            This Week
-          </button>
-          <button className="btn btn-outline" style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }} onClick={nextWeek}>
-            Next Week <ChevronRight size={16} />
-          </button>
-          <button className="btn btn-outline" style={{ padding: '8px 10px', display: 'flex' }} onClick={fetchAppointments} title="Refresh">
-            <RefreshCw size={15} />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Filter Bar ── */}
-      <div className="glass-panel" style={{ padding: '14px 18px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* ── Filter Bar ── */}
+        <div className="glass-panel" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontWeight: 700, fontSize: '0.82rem', flexShrink: 0 }}>
           <Filter size={14} /> Filters
         </div>
@@ -216,9 +218,11 @@ function DoctorView() {
         <span style={{ marginLeft: 'auto', fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>
           {totalShown} result{totalShown !== 1 ? 's' : ''}
         </span>
-      </div>
+        </div>
+      </div>{/* end sticky header */}
 
-      {/* ── Content ── */}
+      {/* ── Content — only this scrolls ── */}
+      <div style={{ paddingTop: '16px' }}>
       {loading ? (
         <MedicalLoader text="Loading appointments…" />
       ) : grouped.length === 0 ? (
@@ -347,6 +351,7 @@ function DoctorView() {
           })}
         </div>
       )}
+      </div>{/* end scrollable content */}
     </div>
   );
 }
@@ -529,9 +534,6 @@ function ReceptionistView({ queue, onAddAppointment }) {
               <div>
                 <div style={{ fontWeight: 700, color: isEmergency ? emergencyRed : '#374151', fontSize: '0.95rem' }}>
                   {isEmergency ? 'EMERGENCY CASE — Highlighted in Queue' : 'Mark as Emergency Case'}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: isEmergency ? '#ef4444' : '#9ca3af' }}>
-                  {isEmergency ? 'Patient will be prioritized and highlighted in red' : 'Tick if patient needs immediate attention'}
                 </div>
               </div>
             </div>
@@ -790,16 +792,12 @@ export default function Appointments() {
 
   // Doctor / Admin → week view
   if (role === 'Doctor' || role === 'Admin') {
-    return (
-      <div style={{ padding: '20px' }}>
-        <DoctorView />
-      </div>
-    );
+    return <DoctorView />;
   }
 
   // Receptionist → booking form + today's queue
   return (
-    <div style={{ padding: '20px', height: '100%' }}>
+    <div style={{ height: '100%' }}>
       <ReceptionistView queue={queue} onAddAppointment={handleAddAppointment} />
     </div>
   );
