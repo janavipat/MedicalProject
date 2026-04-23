@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   BookOpen, Search, Edit, Plus, Loader2, RefreshCw, X, Save,
-  ChevronDown, ChevronUp, Pill, Trash2, Stethoscope, Activity, Check,
+  ChevronDown, ChevronUp, Pill, Stethoscope, Activity, Check, AlertTriangle,
 } from 'lucide-react';
 import MedicalLoader from '../components/MedicalLoader.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -13,7 +13,7 @@ const DOSHA_STYLE = {
   'Pitta':       { bg: 'rgba(239,68,68,0.1)',    color: '#ef4444' },
   'Vata':        { bg: 'rgba(59,130,246,0.1)',   color: '#3b82f6' },
   'Kapha':       { bg: 'rgba(245,158,11,0.1)',   color: '#f59e0b' },
-  'Tridosha':    { bg: 'rgba(22,163,74,0.1)',   color: '#16a34a' },
+  'Tridosha':    { bg: 'rgba(22,163,74,0.1)',    color: '#16a34a' },
   'Vata-Pitta':  { bg: 'rgba(139,92,246,0.1)',   color: '#8b5cf6' },
   'Kapha-Vata':  { bg: 'rgba(245,158,11,0.1)',   color: '#f59e0b' },
   'Pitta-Vata':  { bg: 'rgba(239,68,68,0.1)',    color: '#ef4444' },
@@ -23,19 +23,19 @@ const DOSHA_STYLE = {
 const doshaStyle = (d) => DOSHA_STYLE[d] || { bg: 'rgba(22,163,74,0.1)', color: '#16a34a' };
 
 /* ── Disease Card ─────────────────────────────────────────────────────────── */
-function DiseaseCard({ d, onEdit, isSelected }) {
+function DiseaseCard({ d, onEdit }) {
   const [expanded, setExpanded] = useState(false);
   const ds = doshaStyle(d.mainDosha);
 
   return (
-    <div style={{
-      padding: '20px', background: isSelected ? '#f0fdf4' : 'var(--bg-card)', borderRadius: '16px',
-      border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-      transition: 'box-shadow 0.2s, border-color 0.2s',
-      display: 'flex', flexDirection: 'column', gap: '14px',
-    }}
-      onMouseEnter={e => { if (!isSelected) e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; }}
-      onMouseLeave={e => { if (!isSelected) e.currentTarget.style.boxShadow = 'none'; }}
+    <div
+      style={{
+        padding: '20px', background: 'var(--bg-card)', borderRadius: '16px',
+        border: '1px solid var(--border-color)', transition: 'box-shadow 0.2s',
+        display: 'flex', flexDirection: 'column', gap: '14px',
+      }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
     >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -58,23 +58,21 @@ function DiseaseCard({ d, onEdit, isSelected }) {
           )}
           <button
             onClick={() => onEdit(d)}
-            style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid var(--border-color)', background: isSelected ? 'var(--primary)' : 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.querySelector('svg').style.color = 'white'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = isSelected ? 'var(--primary)' : 'var(--bg-muted)'; e.currentTarget.querySelector('svg').style.color = isSelected ? 'white' : 'var(--text-muted)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-muted)'; e.currentTarget.querySelector('svg').style.color = 'var(--text-muted)'; }}
           >
-            <Edit size={14} color={isSelected ? 'white' : 'var(--text-muted)'} />
+            <Edit size={14} color="var(--text-muted)" />
           </button>
         </div>
       </div>
 
-      {/* System type */}
       {d.type && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           <Activity size={13} /> {d.type} System
         </div>
       )}
 
-      {/* Medicines */}
       {d.commonMedicines?.length > 0 && (
         <div>
           <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -88,7 +86,6 @@ function DiseaseCard({ d, onEdit, isSelected }) {
         </div>
       )}
 
-      {/* Pathya / Apathya toggle */}
       {(d.pathya || d.apathya) && (
         <>
           <button
@@ -124,37 +121,23 @@ function DiseaseCard({ d, onEdit, isSelected }) {
   );
 }
 
-/* ── Inline Disease Form (Add / Edit) ────────────────────────────────────── */
-function DiseaseForm({ disease, onClose, onSave }) {
+/* ── Disease Modal (Add / Edit) — same pattern as Inventory & Billing ─────── */
+function DiseaseModal({ disease, onClose, onSave }) {
   const { authFetch } = useAuth();
   const [form, setForm] = useState(
     disease
       ? { ...disease }
       : { name: '', localName: '', type: '', mainDosha: '', commonMedicines: [], pathya: '', apathya: '', description: '' }
   );
-  const [medInput, setMedInput]     = useState('');
+  const [medInput, setMedInput]           = useState('');
   const [medSuggestions, setMedSuggestions] = useState([]);
-  const [showMedSug, setShowMedSug] = useState(false);
-  const [saving, setSaving]         = useState(false);
-  const [error, setError]           = useState('');
+  const [showMedSug, setShowMedSug]       = useState(false);
+  const [saving, setSaving]               = useState(false);
+  const [error, setError]                 = useState('');
   const medRef = useRef(null);
-
-  // Reset form when disease prop changes (switching between add/edit)
-  useEffect(() => {
-    setForm(
-      disease
-        ? { ...disease }
-        : { name: '', localName: '', type: '', mainDosha: '', commonMedicines: [], pathya: '', apathya: '', description: '' }
-    );
-    setError('');
-    setMedInput('');
-    setMedSuggestions([]);
-    setShowMedSug(false);
-  }, [disease]);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  /* Medicine autocomplete from inventory */
   const fetchMedSuggestions = async (q) => {
     if (!q || q.length < 2) { setMedSuggestions([]); setShowMedSug(false); return; }
     try {
@@ -166,39 +149,27 @@ function DiseaseForm({ disease, onClose, onSave }) {
   };
 
   const addMedFromSuggestion = (name) => {
-    if (name && !form.commonMedicines.includes(name)) {
-      set('commonMedicines', [...form.commonMedicines, name]);
-    }
-    setMedInput('');
-    setMedSuggestions([]);
-    setShowMedSug(false);
+    if (name && !form.commonMedicines.includes(name)) set('commonMedicines', [...form.commonMedicines, name]);
+    setMedInput(''); setMedSuggestions([]); setShowMedSug(false);
     medRef.current?.focus();
   };
 
   const addMedManual = () => {
     const v = medInput.trim();
-    if (v && !form.commonMedicines.includes(v)) {
-      set('commonMedicines', [...form.commonMedicines, v]);
-    }
-    setMedInput('');
-    setMedSuggestions([]);
-    setShowMedSug(false);
+    if (v && !form.commonMedicines.includes(v)) set('commonMedicines', [...form.commonMedicines, v]);
+    setMedInput(''); setMedSuggestions([]); setShowMedSug(false);
   };
 
   const removeMed = (m) => set('commonMedicines', form.commonMedicines.filter(x => x !== m));
 
   const handleSave = async () => {
     if (!form.name.trim()) { setError('Disease name is required.'); return; }
-    setError('');
-    setSaving(true);
+    setError(''); setSaving(true);
     try {
       const method = disease ? 'PUT' : 'POST';
       const url    = disease ? `${API}/api/diseases/${disease._id}` : `${API}/api/diseases`;
       const r = await authFetch(url, { method, body: JSON.stringify(form) });
-      if (!r.ok) {
-        const e = await r.json();
-        throw new Error(e.error || 'Save failed');
-      }
+      if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'Save failed'); }
       onSave();
     } catch (e) { setError(e.message); }
     finally { setSaving(false); }
@@ -207,222 +178,203 @@ function DiseaseForm({ disease, onClose, onSave }) {
   const ds = doshaStyle(form.mainDosha);
 
   return (
-    <div className="glass-panel" style={{ padding: 0, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 200px)' }}>
-
-      {/* Header */}
-      <div style={{
-        padding: '20px 24px', borderBottom: '1px solid var(--border-color)',
-        background: 'var(--bg-muted)', borderRadius: '20px 20px 0 0',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+      backdropFilter: 'blur(6px)', zIndex: 999,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+    }}>
+      <div className="glass-panel" style={{
+        width: '660px', maxHeight: '90vh', padding: 0, borderRadius: '20px',
+        display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Stethoscope size={18} color="#16a34a" />
+
+        {/* Fixed Header */}
+        <div style={{
+          flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '20px 24px', background: 'var(--bg-muted)',
+          borderBottom: '1px solid var(--border-color)', borderRadius: '20px 20px 0 0',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Stethoscope size={18} color="#16a34a" />
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>
+                {disease ? 'Edit Disease Protocol' : 'Add New Disease Protocol'}
+              </h2>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                {disease ? 'Update Ayurvedic treatment protocol' : 'Define medicines, pathya and apathya'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>
-              {disease ? 'Edit Disease Protocol' : 'Add New Disease Protocol'}
-            </h2>
-            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              {disease ? 'Update Ayurvedic treatment protocol' : 'Define medicines, pathya and apathya'}
-            </p>
-          </div>
+          <button
+            onClick={onClose}
+            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
+          ><X size={16} /></button>
         </div>
-        <button
-          onClick={onClose}
-          style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-          onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-          onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
-        >
-          <X size={16} />
-        </button>
-      </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Scrollable Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-        {/* Section: Basic Info */}
-        <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <BookOpen size={12} /> Basic Information
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Disease Name (Ayurvedic) <span style={{ color: '#ef4444' }}>*</span></label>
-              <input className="input-field" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Amlapitta" autoFocus />
+          {/* Section 1 — Basic Info */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <BookOpen size={11} /> Basic Information
             </div>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Local / Common Name</label>
-              <input className="input-field" value={form.localName} onChange={e => set('localName', e.target.value)} placeholder="e.g. Hyperacidity / GERD" />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">System / Type</label>
-                <input className="input-field" value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Digestive, Respiratory" />
+                <label className="input-label">Disease Name (Ayurvedic) <span style={{ color: '#ef4444' }}>*</span></label>
+                <input className="input-field" value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Amlapitta" autoFocus />
               </div>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label className="input-label">Main Dosha</label>
-                <select className="input-field" value={form.mainDosha} onChange={e => set('mainDosha', e.target.value)} style={{ appearance: 'auto' }}>
-                  <option value="">Select Dosha</option>
-                  {['Vata', 'Pitta', 'Kapha', 'Vata-Pitta', 'Kapha-Vata', 'Pitta-Kapha', 'Tridosha'].map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-                {form.mainDosha && (
-                  <div style={{ marginTop: '6px' }}>
-                    <span style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: ds.bg, color: ds.color }}>{form.mainDosha}</span>
-                  </div>
-                )}
+                <label className="input-label">Local / Common Name</label>
+                <input className="input-field" value={form.localName} onChange={e => set('localName', e.target.value)} placeholder="e.g. Hyperacidity / GERD" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label">System / Type</label>
+                  <input className="input-field" value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Digestive, Respiratory" />
+                </div>
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label">Main Dosha</label>
+                  <select className="input-field" value={form.mainDosha} onChange={e => set('mainDosha', e.target.value)} style={{ appearance: 'auto' }}>
+                    <option value="">Select Dosha</option>
+                    {['Vata', 'Pitta', 'Kapha', 'Vata-Pitta', 'Kapha-Vata', 'Pitta-Kapha', 'Tridosha'].map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  {form.mainDosha && (
+                    <div style={{ marginTop: '6px' }}>
+                      <span style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: ds.bg, color: ds.color }}>{form.mainDosha}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Section: Medicines */}
-        <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #059669' }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Pill size={12} /> Standard Medicines (from Inventory)
-          </div>
-
-          {/* Autocomplete input */}
-          <div style={{ position: 'relative', marginBottom: '10px' }}>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <input
-                  ref={medRef}
-                  className="input-field"
-                  value={medInput}
-                  onChange={e => { setMedInput(e.target.value); fetchMedSuggestions(e.target.value); }}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMedManual(); } }}
-                  onBlur={() => setTimeout(() => setShowMedSug(false), 160)}
-                  placeholder="Search inventory or type medicine name..."
-                  autoComplete="off"
-                />
-                {showMedSug && medSuggestions.length > 0 && (
-                  <div style={{
-                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 300,
-                    background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-                    borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    marginTop: '4px', maxHeight: '200px', overflowY: 'auto',
-                  }}>
-                    {medSuggestions.map(s => {
-                      const qty = s.stockQuantity ?? 0;
-                      const alreadyAdded = form.commonMedicines.includes(s.medicineName);
-                      const stockColor = qty === 0 ? '#ef4444' : qty <= (s.lowStockThreshold || 10) ? '#f59e0b' : '#16a34a';
-                      return (
-                        <div
-                          key={s._id}
-                          onMouseDown={() => addMedFromSuggestion(s.medicineName)}
-                          style={{
-                            padding: '9px 14px', cursor: alreadyAdded ? 'default' : 'pointer',
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            borderBottom: '1px solid var(--border-color)',
-                            opacity: alreadyAdded ? 0.5 : 1,
-                          }}
-                          onMouseEnter={e => !alreadyAdded && (e.currentTarget.style.background = 'var(--bg-muted)')}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <div>
-                            <div style={{ fontWeight: 600, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              {s.medicineName}
-                              {alreadyAdded && <span style={{ fontSize: '0.7rem', color: '#16a34a', background: 'rgba(22,163,74,0.1)', padding: '1px 6px', borderRadius: '8px' }}>Added</span>}
+          {/* Section 2 — Medicines */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #059669' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Pill size={11} /> Standard Medicines (from Inventory)
+            </div>
+            <div style={{ position: 'relative', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ flex: 1, position: 'relative' }}>
+                  <input
+                    ref={medRef}
+                    className="input-field"
+                    value={medInput}
+                    onChange={e => { setMedInput(e.target.value); fetchMedSuggestions(e.target.value); }}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMedManual(); } }}
+                    onBlur={() => setTimeout(() => setShowMedSug(false), 160)}
+                    placeholder="Search inventory or type medicine name..."
+                    autoComplete="off"
+                  />
+                  {showMedSug && medSuggestions.length > 0 && (
+                    <div style={{
+                      position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 300,
+                      background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+                      borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                      marginTop: '4px', maxHeight: '180px', overflowY: 'auto',
+                    }}>
+                      {medSuggestions.map(s => {
+                        const qty = s.stockQuantity ?? 0;
+                        const alreadyAdded = form.commonMedicines.includes(s.medicineName);
+                        const stockColor = qty === 0 ? '#ef4444' : qty <= (s.lowStockThreshold || 10) ? '#f59e0b' : '#16a34a';
+                        return (
+                          <div
+                            key={s._id}
+                            onMouseDown={() => addMedFromSuggestion(s.medicineName)}
+                            style={{
+                              padding: '9px 14px', cursor: alreadyAdded ? 'default' : 'pointer',
+                              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                              borderBottom: '1px solid var(--border-color)', opacity: alreadyAdded ? 0.5 : 1,
+                            }}
+                            onMouseEnter={e => !alreadyAdded && (e.currentTarget.style.background = 'var(--bg-muted)')}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 600, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                {s.medicineName}
+                                {alreadyAdded && <span style={{ fontSize: '0.7rem', color: '#16a34a', background: 'rgba(22,163,74,0.1)', padding: '1px 6px', borderRadius: '8px' }}>Added</span>}
+                              </div>
+                              {s.formulation && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1px' }}>{s.formulation}{s.brand ? ` · ${s.brand}` : ''}</div>}
                             </div>
-                            {s.formulation && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1px' }}>{s.formulation}{s.brand ? ` · ${s.brand}` : ''}</div>}
+                            <span style={{ fontSize: '0.7rem', color: stockColor, background: `${stockColor}18`, padding: '2px 8px', borderRadius: '10px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                              {qty === 0 ? 'Out' : `${qty} left`}
+                            </span>
                           </div>
-                          <span style={{ fontSize: '0.7rem', color: stockColor, background: `${stockColor}18`, padding: '2px 8px', borderRadius: '10px', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                            {qty === 0 ? 'Out' : `${qty} left`}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <button type="button" className="btn btn-secondary" onClick={addMedManual} style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                  <Plus size={15} /> Add
+                </button>
               </div>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={addMedManual}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-              >
-                <Plus size={15} /> Add
-              </button>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '6px 0 0' }}>
+                Type to search from inventory · Press Enter or click Add to add manually
+              </p>
             </div>
-            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '6px 0 0' }}>
-              Type to search from inventory · Press Enter or click Add to add manually
-            </p>
+            {form.commonMedicines.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                {form.commonMedicines.map(m => (
+                  <span key={m} style={{ padding: '5px 12px', background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.25)', borderRadius: '20px', fontSize: '0.8rem', color: '#16a34a', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Pill size={11} /> {m}
+                    <button onClick={() => removeMed(m)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#6b7280', display: 'flex', alignItems: 'center' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Section 3 — Pathya / Apathya */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <section style={{ background: '#f0fdf4', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #16a34a' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Check size={11} /> Pathya — Do's
+              </div>
+              <textarea className="input-field" rows={4} value={form.pathya} onChange={e => set('pathya', e.target.value)}
+                placeholder="e.g. Light easily digestible food, rest..."
+                style={{ resize: 'vertical', borderColor: 'rgba(22,163,74,0.25)', background: 'white', marginBottom: 0 }} />
+            </section>
+            <section style={{ background: '#fef2f2', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #dc2626' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <X size={11} /> Apathya — Don'ts
+              </div>
+              <textarea className="input-field" rows={4} value={form.apathya} onChange={e => set('apathya', e.target.value)}
+                placeholder="e.g. Spicy food, heavy meals, cold drinks..."
+                style={{ resize: 'vertical', borderColor: 'rgba(220,38,38,0.2)', background: 'white', marginBottom: 0 }} />
+            </section>
           </div>
 
-          {/* Medicine chips */}
-          {form.commonMedicines.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '12px', background: 'var(--bg-muted)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-              {form.commonMedicines.map(m => (
-                <span key={m} style={{
-                  padding: '5px 12px', background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.25)',
-                  borderRadius: '20px', fontSize: '0.8rem', color: '#16a34a', fontWeight: 500,
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                }}>
-                  <Pill size={11} /> {m}
-                  <button
-                    onClick={() => removeMed(m)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', color: '#6b7280', display: 'flex', alignItems: 'center', lineHeight: 1 }}
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
+          {/* Error */}
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', fontSize: '0.85rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={15} /> {error}
             </div>
           )}
-        </section>
 
-        {/* Section: Pathya / Apathya */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          <section style={{ background: '#f0fdf4', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #16a34a' }}>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Check size={12} /> Pathya — Do's
-            </div>
-            <textarea
-              className="input-field"
-              rows={4}
-              value={form.pathya}
-              onChange={e => set('pathya', e.target.value)}
-              placeholder="e.g. Light easily digestible food, rest..."
-              style={{ resize: 'vertical', borderColor: 'rgba(22,163,74,0.25)', background: 'white', marginBottom: 0 }}
-            />
-          </section>
-          <section style={{ background: '#fef2f2', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #dc2626' }}>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <X size={12} /> Apathya — Don'ts
-            </div>
-            <textarea
-              className="input-field"
-              rows={4}
-              value={form.apathya}
-              onChange={e => set('apathya', e.target.value)}
-              placeholder="e.g. Spicy food, heavy meals, cold drinks..."
-              style={{ resize: 'vertical', borderColor: 'rgba(220,38,38,0.2)', background: 'white', marginBottom: 0 }}
-            />
-          </section>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', fontSize: '0.85rem', color: '#dc2626' }}>
-            {error}
-          </div>
-        )}
+        {/* Fixed Footer — Save button always visible */}
+        <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '12px' }}>
+          <button
+            className="btn btn-primary"
+            style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+            onClick={handleSave} disabled={saving}
+          >
+            {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> {disease ? 'Update Protocol' : 'Save Protocol'}</>}
+          </button>
+          <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '100px' }}>Cancel</button>
+        </div>
 
-      </div>
-
-      {/* Sticky footer — always visible */}
-      <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <button
-          className="btn btn-primary"
-          style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> {disease ? 'Update Protocol' : 'Save Protocol'}</>}
-        </button>
-        <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '100px' }}>Cancel</button>
       </div>
     </div>
   );
@@ -435,7 +387,7 @@ export default function DiseaseManager() {
   const [search, setSearch]         = useState('');
   const [loading, setLoading]       = useState(true);
   const [editTarget, setEditTarget] = useState(null);
-  const [showForm, setShowForm]     = useState(false);
+  const [showModal, setShowModal]   = useState(false);
 
   const fetchDiseases = useCallback(async () => {
     setLoading(true);
@@ -449,21 +401,29 @@ export default function DiseaseManager() {
 
   useEffect(() => { fetchDiseases(); }, [fetchDiseases]);
 
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    const el = document.querySelector('.main-content');
+    if (el) el.style.overflow = showModal ? 'hidden' : '';
+    return () => { if (el) el.style.overflow = ''; };
+  }, [showModal]);
+
   const filtered = diseases.filter(d =>
     d.name?.toLowerCase().includes(search.toLowerCase()) ||
     d.localName?.toLowerCase().includes(search.toLowerCase()) ||
     d.type?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openAdd  = () => { setEditTarget(null); setShowForm(true); };
-  const openEdit = (d) => { setEditTarget(d); setShowForm(true); };
-  const closeForm   = () => { setShowForm(false); setEditTarget(null); };
-  const handleSaved = () => { closeForm(); fetchDiseases(); };
+  const openAdd   = () => { setEditTarget(null); setShowModal(true); };
+  const openEdit  = (d) => { setEditTarget(d); setShowModal(true); };
+  const closeModal  = () => { setShowModal(false); setEditTarget(null); };
+  const handleSaved = () => { closeModal(); fetchDiseases(); };
 
   return (
     <div className="animate-fade-in">
+      {showModal && <DiseaseModal disease={editTarget} onClose={closeModal} onSave={handleSaved} />}
 
-      {/* Sticky top section: page header + search */}
+      {/* Sticky top: title + search */}
       <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--bg-dark)', paddingTop: '24px', paddingBottom: '12px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
@@ -474,12 +434,8 @@ export default function DiseaseManager() {
             <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={fetchDiseases}>
               <RefreshCw size={15} />
             </button>
-            <button
-              className={showForm && !editTarget ? 'btn btn-outline' : 'btn btn-primary'}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              onClick={showForm && !editTarget ? closeForm : openAdd}
-            >
-              {showForm && !editTarget ? <><X size={18} /> Close Form</> : <><Plus size={18} /> Add Disease</>}
+            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={openAdd}>
+              <Plus size={18} /> Add Disease
             </button>
           </div>
         </div>
@@ -503,47 +459,27 @@ export default function DiseaseManager() {
         </div>
       </div>
 
-      {/* Main content area — flex row when form is open */}
-      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', paddingTop: '16px' }}>
-
-        {/* Left: disease list */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {loading ? (
-            <MedicalLoader text="Loading disease protocols…" />
-          ) : filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '80px 0', color: '#9ca3af' }}>
-              <BookOpen size={48} color="#e5e7eb" style={{ marginBottom: '14px' }} />
-              <div style={{ fontWeight: 700, fontSize: '1rem' }}>No diseases found</div>
-              <div style={{ fontSize: '0.85rem', marginTop: '6px' }}>
-                {search ? 'Try a different search term.' : 'Click "Add Disease" to create a new protocol.'}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                {filtered.length} protocol{filtered.length !== 1 ? 's' : ''} found
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: showForm ? '1fr' : 'repeat(auto-fill, minmax(400px, 1fr))', gap: '16px' }}>
-                {filtered.map(d => (
-                  <DiseaseCard
-                    key={d._id}
-                    d={d}
-                    onEdit={openEdit}
-                    isSelected={editTarget?._id === d._id}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Right: inline form panel — sticky so it stays in view while list scrolls */}
-        {showForm && (
-          <div style={{ width: '500px', flexShrink: 0, position: 'sticky', top: '170px', alignSelf: 'flex-start' }}>
-            <DiseaseForm disease={editTarget} onClose={closeForm} onSave={handleSaved} />
+      {/* Content */}
+      {loading ? (
+        <MedicalLoader text="Loading disease protocols…" />
+      ) : filtered.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '80px 0', color: '#9ca3af' }}>
+          <BookOpen size={48} color="#e5e7eb" style={{ marginBottom: '14px' }} />
+          <div style={{ fontWeight: 700, fontSize: '1rem' }}>No diseases found</div>
+          <div style={{ fontSize: '0.85rem', marginTop: '6px' }}>
+            {search ? 'Try a different search term.' : 'Click "Add Disease" to create a new protocol.'}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px', paddingTop: '16px' }}>
+            {filtered.length} protocol{filtered.length !== 1 ? 's' : ''} found
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '16px' }}>
+            {filtered.map(d => <DiseaseCard key={d._id} d={d} onEdit={openEdit} />)}
+          </div>
+        </>
+      )}
     </div>
   );
 }
