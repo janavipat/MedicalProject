@@ -119,120 +119,127 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 999,
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 999,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
     }}>
-      <div className="glass-panel" style={{ width: '560px', maxHeight: '90vh', overflowY: 'auto', padding: '28px' }}>
+      <div className="glass-panel" style={{ width: '560px', maxHeight: '90vh', padding: 0, borderRadius: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <IndianRupee size={20} color="var(--primary)" /> Create Receipt
-          </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
-            <X size={20} />
-          </button>
+        {/* Fixed Header */}
+        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)', borderRadius: '20px 20px 0 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <IndianRupee size={18} color="#16a34a" />
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Create Receipt</h2>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Generate invoice & record payment for patient</p>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
+          ><X size={16} /></button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        {/* Scrollable Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-          {/* ── Patient Search ── */}
-          <div className="input-group" style={{ position: 'relative', margin: 0 }}>
-            <label className="input-label">
-              Patient Name <span style={{ color: 'red' }}>*</span>
-              {selectedPatient && (
-                <span style={{ marginLeft: '8px', fontSize: '0.72rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
-                  ✓ Existing Patient
-                </span>
-              )}
-              {isNewPatient && (
-                <span style={{ marginLeft: '8px', fontSize: '0.72rem', background: '#f0fdf4', color: '#2563eb', border: '1px solid #bfdbfe', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
-                  + New Patient — will be registered
-                </span>
-              )}
-            </label>
-            <div style={{ position: 'relative' }}>
-              <Search size={15} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
-              <input
-                className="input-field"
-                style={{
-                  paddingLeft: '34px', paddingRight: selectedPatient ? '34px' : '12px',
-                  borderColor: selectedPatient ? '#86efac' : isNewPatient ? '#bfdbfe' : undefined,
-                }}
-                placeholder="Search existing or type new name..."
-                value={patientQuery}
-                onChange={e => searchPatient(e.target.value)}
-                autoComplete="off"
-              />
-              {searching && (
-                <Loader2 size={14} className="animate-spin" style={{ position: 'absolute', right: '11px', top: '50%', transform: 'translateY(-50%)', color: '#16a34a' }} />
-              )}
-              {selectedPatient && !searching && (
-                <button type="button" onClick={clearPatient} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}>
-                  <X size={15} />
-                </button>
-              )}
+          {/* Section 1 — Patient */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <User size={11} /> Patient
             </div>
-
-            {/* Autocomplete dropdown */}
-            {patientSuggestions.length > 0 && (
-              <div className="glass-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, maxHeight: '180px', overflowY: 'auto', padding: '4px', marginTop: '2px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
-                {patientSuggestions.map(p => (
-                  <div key={p._id || p.id} onClick={() => selectPatient(p)}
-                    style={{ padding: '9px 12px', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-muted)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                  >
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{p.name}</div>
-                      <div style={{ fontSize: '0.73rem', color: '#6b7280', marginTop: '1px' }}>
-                        {p.age ? `${p.age}y` : ''}{p.age && p.gender ? ' • ' : ''}{p.gender || ''}{p.contact ? ` • ${p.contact}` : ''}
+            <div className="input-group" style={{ position: 'relative', margin: 0 }}>
+              <label className="input-label">
+                Patient Name <span style={{ color: 'red' }}>*</span>
+                {selectedPatient && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.72rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                    ✓ Existing
+                  </span>
+                )}
+                {isNewPatient && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.72rem', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                    + New — will be registered
+                  </span>
+                )}
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Search size={15} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
+                <input
+                  className="input-field"
+                  style={{ paddingLeft: '34px', paddingRight: selectedPatient ? '34px' : '12px', borderColor: selectedPatient ? '#86efac' : isNewPatient ? '#bfdbfe' : undefined }}
+                  placeholder="Search existing or type new name..."
+                  value={patientQuery}
+                  onChange={e => searchPatient(e.target.value)}
+                  autoComplete="off"
+                />
+                {searching && <Loader2 size={14} className="animate-spin" style={{ position: 'absolute', right: '11px', top: '50%', transform: 'translateY(-50%)', color: '#16a34a' }} />}
+                {selectedPatient && !searching && (
+                  <button type="button" onClick={clearPatient} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}>
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
+              {patientSuggestions.length > 0 && (
+                <div className="glass-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, maxHeight: '180px', overflowY: 'auto', padding: '4px', marginTop: '2px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
+                  {patientSuggestions.map(p => (
+                    <div key={p._id || p.id} onClick={() => selectPatient(p)}
+                      style={{ padding: '9px 12px', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-muted)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{p.name}</div>
+                        <div style={{ fontSize: '0.73rem', color: '#6b7280', marginTop: '1px' }}>
+                          {p.age ? `${p.age}y` : ''}{p.age && p.gender ? ' • ' : ''}{p.gender || ''}{p.contact ? ` • ${p.contact}` : ''}
+                        </div>
                       </div>
+                      <span style={{ fontSize: '0.7rem', background: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>Existing</span>
                     </div>
-                    <span style={{ fontSize: '0.7rem', background: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>Existing</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+              {isNewPatient && patientSuggestions.length === 0 && !searching && (
+                <div style={{ marginTop: '5px', fontSize: '0.76rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <User size={12} /> No existing patient — a new record will be created automatically.
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Section 2 — Bill Details */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #059669' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <FileText size={11} /> Bill Details
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div className="input-group" style={{ margin: 0 }}>
+                <label className="input-label">Bill Type</label>
+                <select className="input-field" value={billType} onChange={e => setBillType(e.target.value)} style={{ appearance: 'auto' }}>
+                  <option value="Consultation">Consultation</option>
+                  <option value="Medicine">Medicine</option>
+                  <option value="Procedure">Procedure</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
-            )}
-
-            {isNewPatient && patientSuggestions.length === 0 && !searching && (
-              <div style={{ marginTop: '5px', fontSize: '0.76rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <User size={12} /> No existing patient found — a new record will be created automatically.
+              <div className="input-group" style={{ margin: 0 }}>
+                <label className="input-label">Payment Method</label>
+                <select className="input-field" value={paymentMethod} onChange={e => setPayMethod(e.target.value)} style={{ appearance: 'auto' }}>
+                  <option value="Cash">Cash</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Card">Card</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
-            )}
-          </div>
+            </div>
+          </section>
 
-          {/* ── Bill Type ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <div className="input-group" style={{ margin: 0 }}>
-              <label className="input-label">Bill Type</label>
-              <select className="input-field" value={billType} onChange={e => setBillType(e.target.value)} style={{ appearance: 'auto' }}>
-                <option value="Consultation">Consultation</option>
-                <option value="Medicine">Medicine</option>
-                <option value="Procedure">Procedure</option>
-                <option value="Other">Other</option>
-              </select>
+          {/* Section 3 — Line Items */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #f59e0b' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <IndianRupee size={11} /> Line Items
             </div>
-            <div className="input-group" style={{ margin: 0 }}>
-              <label className="input-label">Payment Method</label>
-              <select className="input-field" value={paymentMethod} onChange={e => setPayMethod(e.target.value)} style={{ appearance: 'auto' }}>
-                <option value="Cash">Cash</option>
-                <option value="UPI">UPI</option>
-                <option value="Card">Card</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          {/* ── Line Items ── */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <label className="input-label" style={{ margin: 0 }}>Items <span style={{ color: 'red' }}>*</span></label>
-              <button type="button" className="btn btn-outline" style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={addItem}>
-                <Plus size={13} /> Add Item
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
               {items.map((item, idx) => (
                 <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 36px', gap: '8px', alignItems: 'center' }}>
                   <input
@@ -263,73 +270,73 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
                 </div>
               ))}
             </div>
-
-            {/* Total */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
+              <button type="button" className="btn btn-outline" style={{ padding: '5px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={addItem}>
+                <Plus size={13} /> Add Item
+              </button>
               <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--primary)' }}>
                 Total: {fmt(totalAmount)}
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* ── Paid Now toggle ── */}
-          <div
-            onClick={() => setPaidNow(p => !p)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px',
-              borderRadius: '10px', cursor: 'pointer',
-              background: paidNow ? '#f0fdf4' : 'var(--bg-muted)',
-              border: `1.5px solid ${paidNow ? '#86efac' : 'var(--border-color)'}`,
-              transition: 'all 0.2s',
-            }}
-          >
-            <div style={{
-              width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
-              border: `2px solid ${paidNow ? '#16a34a' : '#d1d5db'}`,
-              background: paidNow ? '#16a34a' : 'white',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
-            }}>
-              {paidNow && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L5 9.5L10.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" /></svg>}
+          {/* Section 4 — Payment Status & Notes */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #8b5cf6' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <CheckCircle size={11} /> Payment & Notes
             </div>
-            <div>
+            <div
+              onClick={() => setPaidNow(p => !p)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px',
+                borderRadius: '10px', cursor: 'pointer', marginBottom: '12px',
+                background: paidNow ? '#f0fdf4' : 'white',
+                border: `1.5px solid ${paidNow ? '#86efac' : 'var(--border-color)'}`,
+                transition: 'all 0.2s',
+              }}
+            >
+              <div style={{
+                width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
+                border: `2px solid ${paidNow ? '#16a34a' : '#d1d5db'}`,
+                background: paidNow ? '#16a34a' : 'white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+              }}>
+                {paidNow && <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 6L5 9.5L10.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" /></svg>}
+              </div>
               <div style={{ fontWeight: 700, fontSize: '0.9rem', color: paidNow ? '#16a34a' : 'var(--text-main)' }}>
-                {paidNow ? '✓ Paid' : 'Mark as Paid Now'}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                {paidNow ? `Payment collected via ${paymentMethod}` : 'Leave unchecked to mark as pending'}
+                {paidNow ? `✓ Paid via ${paymentMethod}` : 'Mark as Paid Now'}
               </div>
             </div>
-          </div>
+            <div className="input-group" style={{ margin: 0 }}>
+              <label className="input-label">Notes (optional)</label>
+              <textarea
+                className="input-field" rows={2} style={{ resize: 'none', fontSize: '0.85rem' }}
+                placeholder="Any additional notes..."
+                value={notes} onChange={e => setNotes(e.target.value)}
+              />
+            </div>
+          </section>
 
-          {/* ── Notes ── */}
-          <div className="input-group" style={{ margin: 0 }}>
-            <label className="input-label">Notes (optional)</label>
-            <textarea
-              className="input-field" rows={2} style={{ resize: 'none', fontSize: '0.85rem' }}
-              placeholder="Any additional notes..."
-              value={notes} onChange={e => setNotes(e.target.value)}
-            />
-          </div>
-
-          {/* ── Error ── */}
+          {/* Error */}
           {error && (
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#dc2626', fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <AlertCircle size={15} /> {error}
             </div>
           )}
 
-          {/* ── Actions ── */}
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleCreate} disabled={saving}>
-              {saving
-                ? <><Loader2 size={16} className="animate-spin" /> Creating...</>
-                : <><IndianRupee size={16} /> Create Receipt</>
-              }
-            </button>
-            <button className="btn btn-outline" onClick={onClose} disabled={saving}>Cancel</button>
-          </div>
-
         </div>
+
+        {/* Fixed Footer — always visible */}
+        <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '10px' }}>
+          <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleCreate} disabled={saving}>
+            {saving
+              ? <><Loader2 size={16} className="animate-spin" /> Creating...</>
+              : <><IndianRupee size={16} /> Create Receipt</>
+            }
+          </button>
+          <button className="btn btn-outline" onClick={onClose} disabled={saving} style={{ minWidth: '90px' }}>Cancel</button>
+        </div>
+
       </div>
     </div>
   );

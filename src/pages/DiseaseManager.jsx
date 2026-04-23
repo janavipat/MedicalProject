@@ -207,7 +207,7 @@ function DiseaseForm({ disease, onClose, onSave }) {
   const ds = doshaStyle(form.mainDosha);
 
   return (
-    <div className="glass-panel" style={{ padding: 0, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid var(--border-color)' }}>
+    <div className="glass-panel" style={{ padding: 0, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 200px)' }}>
 
       {/* Header */}
       <div style={{
@@ -238,7 +238,7 @@ function DiseaseForm({ disease, onClose, onSave }) {
         </button>
       </div>
 
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: 'calc(100vh - 240px)', overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         {/* Section: Basic Info */}
         <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
@@ -410,18 +410,19 @@ function DiseaseForm({ disease, onClose, onSave }) {
           </div>
         )}
 
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: '12px', paddingTop: '4px' }}>
-          <button
-            className="btn btn-primary"
-            style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> {disease ? 'Update Protocol' : 'Save Protocol'}</>}
-          </button>
-          <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '100px' }}>Cancel</button>
-        </div>
+      </div>
+
+      {/* Sticky footer — always visible */}
+      <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <button
+          className="btn btn-primary"
+          style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> {disease ? 'Update Protocol' : 'Save Protocol'}</>}
+        </button>
+        <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '100px' }}>Cancel</button>
       </div>
     </div>
   );

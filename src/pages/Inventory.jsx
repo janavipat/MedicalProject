@@ -45,10 +45,10 @@ function AddMedicineModal({ onClose, onSaved }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', padding: 0, borderRadius: '20px' }}>
+      <div className="glass-panel" style={{ width: '520px', maxHeight: '90vh', padding: 0, borderRadius: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-        {/* Modal header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)' }}>
+        {/* Fixed Header */}
+        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border-color)', borderRadius: '20px 20px 0 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(22,163,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Pill size={18} color="#16a34a" />
@@ -64,7 +64,8 @@ function AddMedicineModal({ onClose, onSaved }) {
           ><X size={16} /></button>
         </div>
 
-        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Scrollable Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
           {error && (
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', fontSize: '0.85rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -72,56 +73,69 @@ function AddMedicineModal({ onClose, onSaved }) {
             </div>
           )}
 
-          {/* Medicine name */}
-          <div style={{ background: 'var(--bg-muted)', borderRadius: '10px', padding: '14px', borderLeft: '3px solid var(--primary)' }}>
-            <div className="input-group" style={{ marginBottom: 0 }}>
+          {/* Section 1 — Medicine Identity */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid var(--primary)' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Pill size={11} /> Medicine Identity
+            </div>
+            <div className="input-group" style={{ marginBottom: '12px' }}>
               <label className="input-label">Medicine Name <span style={{ color: '#ef4444' }}>*</span></label>
-              <input className="input-field" value={form.medicineName} onChange={e => set('medicineName', e.target.value)} placeholder="e.g. Triphala Churna" autoFocus />
+              <input className="input-field" value={form.medicineName} onChange={e => set('medicineName', e.target.value)} placeholder="e.g. Triphala Churna" autoFocus style={{ marginBottom: 0 }} />
             </div>
-          </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label className="input-label">Brand</label>
+                <input className="input-field" value={form.brand} onChange={e => set('brand', e.target.value)} placeholder="e.g. Baidyanath" />
+              </div>
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label className="input-label">Formulation</label>
+                <input className="input-field" value={form.formulation} onChange={e => set('formulation', e.target.value)} placeholder="e.g. Churna, Vati" />
+              </div>
+            </div>
+          </section>
 
-          {/* Brand + Formulation */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Brand</label>
-              <input className="input-field" value={form.brand} onChange={e => set('brand', e.target.value)} placeholder="e.g. Baidyanath" />
+          {/* Section 2 — Stock & Pricing */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #f59e0b' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <IndianRupee size={11} /> Stock & Pricing
             </div>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Formulation</label>
-              <input className="input-field" value={form.formulation} onChange={e => set('formulation', e.target.value)} placeholder="e.g. Churna, Vati, Tablet" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label className="input-label">Stock Quantity <span style={{ color: '#ef4444' }}>*</span></label>
+                <input className="input-field" type="number" min="0" value={form.stockQuantity} onChange={e => set('stockQuantity', e.target.value)} placeholder="0" />
+              </div>
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label className="input-label">Price (₹) <span style={{ color: '#ef4444' }}>*</span></label>
+                <input className="input-field" type="number" min="0" value={form.price} onChange={e => set('price', e.target.value)} placeholder="0" />
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Stock + Price */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Stock Quantity <span style={{ color: '#ef4444' }}>*</span></label>
-              <input className="input-field" type="number" min="0" value={form.stockQuantity} onChange={e => set('stockQuantity', e.target.value)} placeholder="0" />
+          {/* Section 3 — Expiry & Alerts */}
+          <section style={{ background: 'var(--bg-muted)', borderRadius: '12px', padding: '16px', borderLeft: '3px solid #8b5cf6' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <AlertTriangle size={11} /> Expiry & Alerts
             </div>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Price (₹) <span style={{ color: '#ef4444' }}>*</span></label>
-              <input className="input-field" type="number" min="0" value={form.price} onChange={e => set('price', e.target.value)} placeholder="0" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label className="input-label">Expiry Date</label>
+                <input className="input-field" type="date" value={form.expiryDate} onChange={e => set('expiryDate', e.target.value)} />
+              </div>
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label className="input-label">Low Stock Alert Level</label>
+                <input className="input-field" type="number" min="1" value={form.lowStockThreshold} onChange={e => set('lowStockThreshold', e.target.value)} />
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Expiry + Low stock threshold */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Expiry Date</label>
-              <input className="input-field" type="date" value={form.expiryDate} onChange={e => set('expiryDate', e.target.value)} />
-            </div>
-            <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label">Low Stock Alert Level</label>
-              <input className="input-field" type="number" min="1" value={form.lowStockThreshold} onChange={e => set('lowStockThreshold', e.target.value)} />
-            </div>
-          </div>
+        </div>
 
-          <div style={{ display: 'flex', gap: '12px', paddingTop: '4px' }}>
-            <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleSave} disabled={saving}>
-              {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> Add Medicine</>}
-            </button>
-            <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '90px' }}>Cancel</button>
-          </div>
+        {/* Fixed Footer — always visible */}
+        <div style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-muted)', display: 'flex', gap: '12px' }}>
+          <button className="btn btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={handleSave} disabled={saving}>
+            {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> Add Medicine</>}
+          </button>
+          <button className="btn btn-outline" onClick={onClose} style={{ minWidth: '90px' }}>Cancel</button>
         </div>
       </div>
     </div>
