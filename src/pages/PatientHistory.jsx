@@ -39,9 +39,9 @@ export default function PatientHistory() {
       <div style="padding:40px;font-family:sans-serif;color:#333;line-height:1.6;">
         <div style="border-bottom:2px solid #16a34a;padding-bottom:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <h2 style="color:#16a34a;margin:0;">Sanjivani Clinic</h2>
-            <div style="font-size:0.85rem;font-weight:bold;margin-top:2px;">Dr. Dharmesh C. Sapovadiya</div>
-            <div style="font-size:0.8rem;color:#555;margin-top:2px;">B.A.M.S. | Ayurvedic Medical Practitioner</div>
+            <h2 style="color:#16a34a;margin:0;">MediCore</h2>
+            <div style="font-size:0.85rem;font-weight:bold;margin-top:2px;">MediCore Clinic</div>
+            <div style="font-size:0.8rem;color:#555;margin-top:2px;">Medical Prescription</div>
           </div>
         </div>
         <div style="margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:10px;">

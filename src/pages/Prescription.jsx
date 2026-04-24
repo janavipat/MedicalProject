@@ -628,7 +628,7 @@ export default function Prescription() {
               <div style={{ fontSize: '0.9rem', color: '#333', fontWeight: 'bold' }}>
                 {userName ? `Dr. ${userName}` : 'Doctor'}
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#666' }}>Apollo Hospitals Group</div>
+              <div style={{ fontSize: '0.8rem', color: '#666' }}>MediCore Clinic</div>
             </div>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.8rem' }}>
               AC

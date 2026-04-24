@@ -40,6 +40,7 @@ export default function Profile() {
 
   // ── Stats ────────────────────────────────────────────────────────────────────
   const [stats, setStats] = useState({ patients: 0, appointments: 0, prescriptions: 0 });
+  const [firstApptDate, setFirstApptDate] = useState(null);
 
   useEffect(() => {
     const extra = user?.uid ? readUserProfile(user.uid) : null;
@@ -52,15 +53,21 @@ export default function Profile() {
       try {
         const [pR, aR, rxR] = await Promise.all([
           authFetch(`${API}/api/patients?limit=1`),
-          authFetch(`${API}/api/appointments?limit=1`),
+          authFetch(`${API}/api/appointments?limit=500`),
           authFetch(`${API}/api/prescriptions?limit=1`),
         ]);
         const [pD, aD, rxD] = await Promise.all([pR.json(), aR.json(), rxR.json()]);
         setStats({
           patients:      pD.total      ?? (Array.isArray(pD)  ? pD.length  : 0),
-          appointments:  aD.total      ?? (Array.isArray(aD)  ? aD.length  : 0),
+          appointments:  aD.total      ?? (Array.isArray(aD.appointments) ? aD.appointments.length : Array.isArray(aD) ? aD.length : 0),
           prescriptions: rxD.total     ?? (Array.isArray(rxD) ? rxD.length : 0),
         });
+        // Find earliest appointment date
+        const appts = Array.isArray(aD.appointments) ? aD.appointments : Array.isArray(aD) ? aD : [];
+        if (appts.length > 0) {
+          const oldest = appts.reduce((min, a) => new Date(a.createdAt) < new Date(min.createdAt) ? a : min, appts[0]);
+          setFirstApptDate(oldest.date || oldest.createdAt);
+        }
       } catch { /* silently ignore */ }
     };
     fetchStats();
@@ -110,9 +117,11 @@ export default function Profile() {
 
   const roleMeta  = ROLE_META[editRole] || ROLE_META.Doctor;
   const RoleIcon  = roleMeta.icon;
-  const joinDate  = user?.metadata?.creationTime
-    ? new Date(user.metadata.creationTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
-    : '—';
+  const memberSince = firstApptDate
+    ? new Date(firstApptDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+    : user?.metadata?.creationTime
+      ? new Date(user.metadata.creationTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '—';
 
   return (
     <div className="animate-fade-in" style={{ padding: '24px', maxWidth: '960px', margin: '0 auto' }}>
@@ -341,10 +350,8 @@ export default function Profile() {
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               {[
-                { icon: Mail,     label: 'Login Email',     value: user?.email || '—' },
-                { icon: Calendar, label: 'Member Since',    value: joinDate },
-                { icon: Shield,   label: 'Auth Provider',   value: user?.providerData?.[0]?.providerId === 'google.com' ? 'Google' : 'Email / Password' },
-                { icon: CheckCircle, label: 'Account Status', value: user?.emailVerified ? 'Verified ✓' : 'Active' },
+                { icon: Mail,     label: 'Login Email',        value: user?.email || '—' },
+                { icon: Calendar, label: 'First Appointment',  value: memberSince },
               ].map(item => (
                 <div key={item.label} style={{ padding: '14px 16px', background: 'var(--bg-muted)', borderRadius: '10px', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                   <item.icon size={18} color="var(--primary)" style={{ marginTop: '2px', flexShrink: 0 }} />

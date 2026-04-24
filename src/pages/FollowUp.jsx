@@ -242,10 +242,16 @@ export default function FollowUp() {
                         <button
                           className="btn btn-outline"
                           style={{ padding: '6px 12px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}
-                          onClick={() => updateStatus(f._id, 'Called')}
+                          onClick={() => {
+                            const phone = (f.contact || '').replace(/\D/g, '');
+                            if (phone && phone !== '0000000000') {
+                              window.location.href = `tel:${phone}`;
+                            }
+                            updateStatus(f._id, 'Called');
+                          }}
                           disabled={updatingId === f._id || f.status === 'Called'}
                         >
-                          {updatingId === f._id ? <Loader2 size={13} className="animate-spin" /> : <PhoneCall size={13} />} Call Log
+                          {updatingId === f._id ? <Loader2 size={13} className="animate-spin" /> : <PhoneCall size={13} />} Call
                         </button>
                         {f.contact && f.contact !== '0000000000' && (
                           <button

@@ -56,10 +56,11 @@ export default function Patients() {
   );
 
   return (
-    <div className="animate-fade-in">
+    /* fill main-content height, never let the page itself scroll */
+    <div className="animate-fade-in" style={{ height: 'calc(100vh - var(--header-height) - 28px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      {/* Sticky top: page header + search */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--bg-dark)', paddingTop: '24px', paddingBottom: '12px' }}>
+      {/* Page header + search — fixed height, no scroll */}
+      <div style={{ flexShrink: 0, paddingTop: '24px', paddingBottom: '12px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
             <h1 className="page-title">Patient Resources</h1>
@@ -100,9 +101,9 @@ export default function Patients() {
         </div>
       )}
 
-      <div className="glass-panel" style={{ marginTop: '16px' }}>
-        {/* Table */}
-        <div className="table-container" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 260px)' }}>
+      {/* Glass panel fills the remaining vertical space; table scrolls inside it */}
+      <div className="glass-panel" style={{ marginTop: '16px', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <div className="table-container" style={{ overflowY: 'auto', flex: 1 }}>
           <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'var(--bg-card)' }}>
               <tr>
