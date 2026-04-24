@@ -83,18 +83,24 @@ export function AuthProvider({ children }) {
   const loginWithGoogle = async () => {
     if (!isFirebaseConfigured) throw new Error('firebase-not-configured');
     const cred = await signInWithPopup(auth, googleProvider);
-    // If new Google user has no saved role, default to Doctor
     const existing = readUserProfile(cred.user.uid);
     if (!existing) {
-      saveUserProfile(cred.user.uid, {
-        name: cred.user.displayName || cred.user.email,
-        role: 'Doctor',
-      });
-      setRole('Doctor');
-    } else {
-      setRole(existing.role);
+      // New Google user — do NOT assign a role yet; caller must call setupNewUser()
+      return { cred, isNewUser: true };
     }
-    return cred;
+    setRole(existing.role);
+    setUserName(existing.name || cred.user.displayName || cred.user.email?.split('@')[0] || 'User');
+    return { cred, isNewUser: false };
+  };
+
+  // Called after Google sign-in when user is brand-new and picks a role
+  const setupNewUser = (role) => {
+    if (!auth?.currentUser) return;
+    const u = auth.currentUser;
+    const name = u.displayName || u.email?.split('@')[0] || 'User';
+    saveUserProfile(u.uid, { name, role });
+    setRole(role);
+    setUserName(name);
   };
 
   const logout = () => {
@@ -140,6 +146,7 @@ export function AuthProvider({ children }) {
         resetPassword,
         getToken,
         authFetch,
+        setupNewUser,
       }}
     >
       {children}

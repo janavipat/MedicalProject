@@ -63,6 +63,7 @@ function App() {
                     <Route path="/follow-ups" element={<FollowUp />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/service" element={<Service />} />
+                    <Route path="/signup" element={<Signup />} />
                   </Routes>
                 </Layout>
               </ProtectedRoute>

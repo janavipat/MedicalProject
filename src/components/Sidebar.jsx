@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Calendar, FileEdit,
   BookOpen, IndianRupee, Pill, Clock, Activity,
-  Stethoscope, ClipboardList, HeadphonesIcon,
+  Stethoscope, ClipboardList, HeadphonesIcon, UserPlus,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -16,6 +16,7 @@ const navItems = [
   { path: '/billing',     label: 'Billing & Payments', icon: IndianRupee },
   { path: '/follow-ups',  label: 'Follow-ups',         icon: Clock },
   { path: '/service',     label: 'Help & Support',     icon: HeadphonesIcon },
+  { path: '/signup',      label: 'Register Staff',     icon: UserPlus, roles: ['Receptionist'] },
 ];
 
 const ROLE_BADGES = {

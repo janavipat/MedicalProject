@@ -1,20 +1,27 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Mail, Lock, Eye, EyeOff, Loader2, AlertTriangle, Heart, Shield, Users, Activity } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, AlertTriangle, Heart, Shield, Users, Activity, Stethoscope, ClipboardList } from 'lucide-react';
 
 const FONT = "'Inter', system-ui, sans-serif";
 
+const ROLES = [
+  { value: 'Doctor',       label: 'Doctor',       desc: 'Clinical access — prescriptions & diagnosis', icon: Stethoscope,   color: '#16a34a' },
+  { value: 'Receptionist', label: 'Receptionist', desc: 'Front-desk — appointments & patient records',  icon: ClipboardList, color: '#059669' },
+];
+
 export default function Login() {
-  const { loginWithEmail, loginWithGoogle, isFirebaseConfigured } = useAuth();
+  const { loginWithEmail, loginWithGoogle, setupNewUser, isFirebaseConfigured } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [step, setStep]               = useState('login'); // 'login' | 'role-select'
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading]         = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError]             = useState('');
+  const [selectedRole, setSelectedRole] = useState('Doctor');
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
@@ -38,9 +45,14 @@ export default function Login() {
     setGoogleLoading(true);
     const timeout = setTimeout(() => setGoogleLoading(false), 60_000);
     try {
-      await loginWithGoogle();
+      const { isNewUser } = await loginWithGoogle();
       clearTimeout(timeout);
-      navigate('/dashboard');
+      if (isNewUser) {
+        // Brand-new Google user — ask them to pick a role before entering the app
+        setStep('role-select');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       clearTimeout(timeout);
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
@@ -50,6 +62,11 @@ export default function Login() {
       clearTimeout(timeout);
       setGoogleLoading(false);
     }
+  };
+
+  const handleRoleConfirm = () => {
+    setupNewUser(selectedRole);
+    navigate('/dashboard');
   };
 
   const inputStyle = {
@@ -76,6 +93,78 @@ export default function Login() {
     letterSpacing: '0.02em',
     textTransform: 'uppercase',
   };
+
+  // ── Role-selection screen (shown to brand-new Google users only) ─────────────
+  if (step === 'role-select') {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#f0fdf4,#dcfce7)', fontFamily: FONT }}>
+        <div style={{ width: '100%', maxWidth: '460px', background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', overflow: 'hidden' }}>
+          {/* Accent bar */}
+          <div style={{ height: 5, background: 'linear-gradient(90deg,#15803d,#16a34a,#22c55e)' }} />
+          <div style={{ padding: '36px 40px' }}>
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <div style={{ width: 60, height: 60, borderRadius: '16px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <Activity size={28} color="#16a34a" />
+              </div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827', margin: '0 0 8px', letterSpacing: '-0.03em' }}>
+                Welcome to MediCore!
+              </h2>
+              <p style={{ fontSize: '0.88rem', color: '#6b7280', margin: 0 }}>
+                You're almost in. Please select your role to continue.
+              </p>
+            </div>
+
+            {/* Role cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
+              {ROLES.map(({ value, label, desc, icon: Icon, color }) => (
+                <label key={value} onClick={() => setSelectedRole(value)} style={{
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  padding: '16px 18px', borderRadius: '12px', cursor: 'pointer',
+                  border: selectedRole === value ? `2px solid ${color}` : '2px solid #e5e7eb',
+                  background: selectedRole === value ? `${color}10` : 'white',
+                  transition: 'all 0.15s',
+                }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '10px', flexShrink: 0,
+                    background: selectedRole === value ? color : '#f3f4f6',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s',
+                  }}>
+                    <Icon size={20} color={selectedRole === value ? '#fff' : '#9ca3af'} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: selectedRole === value ? color : '#111827' }}>{label}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: '2px' }}>{desc}</div>
+                  </div>
+                  {selectedRole === value && (
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: color, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="11" height="11" viewBox="0 0 10 10"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" /></svg>
+                    </div>
+                  )}
+                </label>
+              ))}
+            </div>
+
+            {/* Confirm button */}
+            <button
+              onClick={handleRoleConfirm}
+              style={{
+                width: '100%', padding: '14px',
+                background: 'linear-gradient(135deg,#16a34a,#15803d)',
+                color: 'white', border: 'none', borderRadius: '10px',
+                fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(22,163,74,0.35)',
+                fontFamily: FONT, letterSpacing: '0.01em',
+              }}
+            >
+              Continue as {selectedRole} →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
