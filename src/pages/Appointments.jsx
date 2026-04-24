@@ -8,6 +8,7 @@ import {
   Filter, RefreshCw,
 } from 'lucide-react';
 import MedicalLoader from '../components/MedicalLoader.jsx';
+import CustomSelect from '../components/CustomSelect.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const STATUS_COLORS = {
@@ -177,22 +178,19 @@ function DoctorView() {
         </div>
 
         {/* Status filter */}
-        <select
+        <CustomSelect
           value={filterStatus}
-          onChange={e => setFilterStatus(e.target.value)}
-          style={{
-            padding: '7px 14px', border: `1.5px solid ${filterStatus ? '#86efac' : 'var(--border-color)'}`,
-            borderRadius: '8px', fontSize: '0.83rem', fontWeight: filterStatus ? 700 : 400,
-            background: filterStatus ? '#f0fdf4' : 'var(--bg-muted)',
-            color: filterStatus ? '#16a34a' : 'var(--text-main)', cursor: 'pointer', outline: 'none',
-          }}
-        >
-          <option value="">All Statuses</option>
-          <option value="Waiting">Waiting</option>
-          <option value="Scheduled">Scheduled</option>
-          <option value="Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
+          onChange={setFilterStatus}
+          placeholder="All Statuses"
+          minWidth="150px"
+          options={[
+            { value: '', label: 'All Statuses' },
+            { value: 'Waiting',   label: 'Waiting',   color: '#92400e', bg: '#fef9ec' },
+            { value: 'Scheduled', label: 'Scheduled', color: '#1d4ed8', bg: '#eff6ff' },
+            { value: 'Completed', label: 'Completed', color: '#16a34a', bg: '#f0fdf4' },
+            { value: 'Cancelled', label: 'Cancelled', color: '#6b7280', bg: '#f9fafb' },
+          ]}
+        />
 
         {(filterDate || filterStatus) && (
           <button
@@ -609,11 +607,12 @@ function ReceptionistView({ queue, onAddAppointment }) {
                 </div>
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Gender</label>
-                  <select className="input-field" value={form.gender} onChange={e => set('gender', e.target.value)}>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
+                  <CustomSelect value={form.gender} onChange={v => set('gender', v)} width="100%"
+                    options={[
+                      { value: 'Male',   label: 'Male' },
+                      { value: 'Female', label: 'Female' },
+                      { value: 'Other',  label: 'Other' },
+                    ]} />
                 </div>
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Phone</label>
@@ -624,17 +623,15 @@ function ReceptionistView({ queue, onAddAppointment }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Blood Group</label>
-                  <select className="input-field" value={form.bloodGroup} onChange={e => set('bloodGroup', e.target.value)}>
-                    <option value="">Unknown</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                  </select>
+                  <CustomSelect value={form.bloodGroup} onChange={v => set('bloodGroup', v)} width="100%"
+                    placeholder="Unknown"
+                    options={[
+                      { value: '',    label: 'Unknown' },
+                      { value: 'A+',  label: 'A+' }, { value: 'A-',  label: 'A-' },
+                      { value: 'B+',  label: 'B+' }, { value: 'B-',  label: 'B-' },
+                      { value: 'AB+', label: 'AB+' },{ value: 'AB-', label: 'AB-' },
+                      { value: 'O+',  label: 'O+' }, { value: 'O-',  label: 'O-' },
+                    ]} />
                 </div>
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Weight (kg)</label>

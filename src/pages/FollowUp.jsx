@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, PhoneCall, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle, MessageCircle, Plus, Save } from 'lucide-react';
+import CustomSelect from '../components/CustomSelect.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import MedicalLoader from '../components/MedicalLoader.jsx';
 
@@ -254,16 +255,17 @@ export default function FollowUp() {
             />
             {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}><X size={15} /></button>}
           </div>
-          <div className="input-field" style={{ display: 'flex', alignItems: 'center', width: '200px', background: 'var(--bg-input)' }}>
-            <CalendarIcon size={18} color="var(--text-muted)" style={{ marginRight: '10px', flexShrink: 0 }} />
-            <select value={filter} onChange={e => setFilter(e.target.value)}
-              style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none', fontSize: '0.9rem' }}>
-              <option value="all">All Follow-ups</option>
-              <option value="today">Due Today</option>
-              <option value="7days">Next 7 Days</option>
-              <option value="overdue">Overdue</option>
-            </select>
-          </div>
+          <CustomSelect
+            value={filter}
+            onChange={setFilter}
+            minWidth="180px"
+            options={[
+              { value: 'all',     label: 'All Follow-ups' },
+              { value: 'today',   label: 'Due Today',    color: '#16a34a', bg: '#f0fdf4' },
+              { value: '7days',   label: 'Next 7 Days',  color: '#1d4ed8', bg: '#eff6ff' },
+              { value: 'overdue', label: 'Overdue',      color: '#ef4444', bg: '#fef2f2' },
+            ]}
+          />
         </div>
 
         {loading ? (

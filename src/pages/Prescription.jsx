@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { FileText, Save, Send, Pill, Plus, X, Loader2, Download, AlertCircle, CheckCircle, HelpCircle } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import Modal from '../components/Modal.jsx';
+import CustomSelect from '../components/CustomSelect.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
@@ -410,13 +411,12 @@ export default function Prescription() {
             </div>
             <div className="input-group">
               <label className="input-label">Gender</label>
-              <select className="input-field" value={patientData.gender}
-                onChange={e => setPatientData(p => ({ ...p, gender: e.target.value }))}
-                style={{ appearance: 'auto' }}>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
+              <CustomSelect value={patientData.gender} onChange={v => setPatientData(p => ({ ...p, gender: v }))} width="100%"
+                options={[
+                  { value: 'Male',   label: 'Male' },
+                  { value: 'Female', label: 'Female' },
+                  { value: 'Other',  label: 'Other' },
+                ]} />
             </div>
             <div className="input-group">
               <label className="input-label">Patient Number</label>
@@ -434,19 +434,15 @@ export default function Prescription() {
             </div>
             <div className="input-group">
               <label className="input-label">Blood Group</label>
-              <select className="input-field" value={patientData.bloodGroup}
-                onChange={e => setPatientData(p => ({ ...p, bloodGroup: e.target.value }))}
-                style={{ appearance: 'auto' }}>
-                <option value="">Unknown</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-              </select>
+              <CustomSelect value={patientData.bloodGroup} onChange={v => setPatientData(p => ({ ...p, bloodGroup: v }))} width="100%"
+                placeholder="Unknown"
+                options={[
+                  { value: '',    label: 'Unknown' },
+                  { value: 'A+',  label: 'A+' }, { value: 'A-',  label: 'A-' },
+                  { value: 'B+',  label: 'B+' }, { value: 'B-',  label: 'B-' },
+                  { value: 'AB+', label: 'AB+' },{ value: 'AB-', label: 'AB-' },
+                  { value: 'O+',  label: 'O+' }, { value: 'O-',  label: 'O-' },
+                ]} />
             </div>
             <div className="input-group">
               <label className="input-label">Weight (kg)</label>

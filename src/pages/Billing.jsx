@@ -4,6 +4,7 @@ import {
   Loader2, RefreshCw, AlertCircle, Plus, X, Trash2, User,
 } from 'lucide-react';
 import MedicalLoader from '../components/MedicalLoader.jsx';
+import CustomSelect from '../components/CustomSelect.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API = 'https://medical-project-h6yc.vercel.app';
@@ -220,21 +221,23 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
             <div className="input-group" style={{ margin: 0 }}>
               <label className="input-label">Bill Type</label>
-              <select className="input-field" value={billType} onChange={e => setBillType(e.target.value)} style={{ appearance: 'auto' }}>
-                <option value="Consultation">Consultation</option>
-                <option value="Medicine">Medicine</option>
-                <option value="Procedure">Procedure</option>
-                <option value="Other">Other</option>
-              </select>
+              <CustomSelect value={billType} onChange={setBillType} width="100%"
+                options={[
+                  { value: 'Consultation', label: 'Consultation' },
+                  { value: 'Medicine',     label: 'Medicine' },
+                  { value: 'Procedure',    label: 'Procedure' },
+                  { value: 'Other',        label: 'Other' },
+                ]} />
             </div>
             <div className="input-group" style={{ margin: 0 }}>
               <label className="input-label">Payment Method</label>
-              <select className="input-field" value={paymentMethod} onChange={e => setPayMethod(e.target.value)} style={{ appearance: 'auto' }}>
-                <option value="Cash">Cash</option>
-                <option value="UPI">UPI</option>
-                <option value="Card">Card</option>
-                <option value="Other">Other</option>
-              </select>
+              <CustomSelect value={paymentMethod} onChange={setPayMethod} width="100%"
+                options={[
+                  { value: 'Cash',  label: 'Cash' },
+                  { value: 'UPI',   label: 'UPI' },
+                  { value: 'Card',  label: 'Card' },
+                  { value: 'Other', label: 'Other' },
+                ]} />
             </div>
           </div>
 
