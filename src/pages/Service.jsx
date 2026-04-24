@@ -1,25 +1,7 @@
 import { useState, useRef } from 'react';
-import emailjs from '@emailjs/browser';
 import { Send, CheckCircle, AlertCircle, Headphones, Mail, MessageSquare, User, HelpCircle, Clock, ShieldCheck } from 'lucide-react';
 
-/**
- * ─── EmailJS configuration ───────────────────────────────────────────────────
- *  1. Sign up free at https://www.emailjs.com/
- *  2. Dashboard → Email Services → Add Service → choose Gmail (or any provider)
- *     and note your Service ID.
- *  3. Email Templates → Create Template.
- *     Set "To Email" to  janavipatel2002@gmail.com
- *     Subject: New Support Request from {{from_name}}
- *     Body can use: {{from_name}}, {{from_email}}, {{message}}
- *     Note your Template ID.
- *  4. Account → General → Public Key — paste below.
- * ─────────────────────────────────────────────────────────────────────────────
- */
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // e.g. 'service_abc123'
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // e.g. 'template_xyz789'
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // e.g. 'abcDEFghiJKL12345'
-
-// ─────────────────────────────────────────────────────────────────────────────
+const API = 'https://medical-project-h6yc.vercel.app';
 
 const FAQ = [
   { q: 'How do I add a new patient?', a: 'Go to the Patients page and click "Add Patient". Fill in the required details and save.' },
@@ -29,7 +11,6 @@ const FAQ = [
 ];
 
 export default function Service() {
-  const formRef = useRef(null);
   const [form, setForm]       = useState({ from_name: '', from_email: '', message: '' });
   const [status, setStatus]   = useState('idle'); // idle | sending | success | error
   const [errMsg, setErrMsg]   = useState('');
@@ -41,23 +22,28 @@ export default function Service() {
     e.preventDefault();
     if (!form.from_name.trim() || !form.from_email.trim() || !form.message.trim()) return;
 
-    // Guard: if still using placeholder keys, warn instead of crashing
-    if (EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID') {
-      setStatus('error');
-      setErrMsg('EmailJS is not configured yet. Please set the SERVICE_ID, TEMPLATE_ID and PUBLIC_KEY in Service.jsx.');
-      return;
-    }
-
     setStatus('sending');
     setErrMsg('');
     try {
-      await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formRef.current, EMAILJS_PUBLIC_KEY);
-      setStatus('success');
-      setForm({ from_name: '', from_email: '', message: '' });
+      const res = await fetch(`${API}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatus('success');
+        setForm({ from_name: '', from_email: '', message: '' });
+      } else {
+        setStatus('error');
+        setErrMsg(data.error || 'Failed to send. Please try again.');
+      }
     } catch (err) {
       console.error(err);
       setStatus('error');
-      setErrMsg(err?.text || 'Failed to send. Please try again or email us directly.');
+      setErrMsg('Network error. Please check your connection and try again.');
     }
   };
 
@@ -113,7 +99,7 @@ export default function Service() {
                 <CheckCircle size={18} color="#16a34a" />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#15803d' }}>Message sent successfully!</div>
-                  <div style={{ fontSize: '0.8rem', color: '#16a34a' }}>We'll respond to your email soon.</div>
+                  <div style={{ fontSize: '0.8rem', color: '#16a34a' }}>We've received your request and will respond soon.</div>
                 </div>
               </div>
             )}
@@ -126,7 +112,7 @@ export default function Service() {
               </div>
             )}
 
-            <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Name */}
               <div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
