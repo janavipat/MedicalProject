@@ -116,7 +116,7 @@ export default function Inventory() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button className="btn btn-outline" style={{ display: 'flex', gap: '8px' }} onClick={fetchInventory}><RefreshCw size={16} /> Refresh</button>
-          {!showAdd && <button className="btn btn-primary" style={{ display: 'flex', gap: '8px' }} onClick={() => setShowAdd(true)}><PlusCircle size={18} /> Add Medicine</button>}
+          <button className="btn btn-primary" style={{ display: 'flex', gap: '8px' }} onClick={() => setShowAdd(true)}><PlusCircle size={18} /> Add Medicine</button>
         </div>
       </div>
 
@@ -228,29 +228,31 @@ export default function Inventory() {
         </div>
       )}
 
-      {!showAdd && <div className="dashboard-grid">
-        <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--primary)' }}>
-          <div className="stat-info">
-            <div className="stat-label">Total Items Tracked</div>
-            <div className="stat-value">{loading ? '—' : totalItems}</div>
+      {!showAdd && (
+        <div className="dashboard-grid">
+          <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--primary)' }}>
+            <div className="stat-info">
+              <div className="stat-label">Total Items Tracked</div>
+              <div className="stat-value">{loading ? '—' : totalItems}</div>
+            </div>
+            <Pill size={40} color="var(--primary)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
           </div>
-          <Pill size={40} color="var(--primary)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
-        </div>
-        <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--danger)' }}>
-          <div className="stat-info">
-            <div className="stat-label">Low / Critical Stock</div>
-            <div className="stat-value" style={{ color: 'var(--danger)' }}>{loading ? '—' : lowStockCount}</div>
+          <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--danger)' }}>
+            <div className="stat-info">
+              <div className="stat-label">Low / Critical Stock</div>
+              <div className="stat-value" style={{ color: 'var(--danger)' }}>{loading ? '—' : lowStockCount}</div>
+            </div>
+            <AlertTriangle size={40} color="var(--danger)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
           </div>
-          <AlertTriangle size={40} color="var(--danger)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
-        </div>
-        <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--warning)' }}>
-          <div className="stat-info">
-            <div className="stat-label">Total Stock Value</div>
-            <div className="stat-value">{loading ? '—' : `₹${stockValue.toLocaleString('en-IN')}`}</div>
+          <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--warning)' }}>
+            <div className="stat-info">
+              <div className="stat-label">Total Stock Value</div>
+              <div className="stat-value">{loading ? '—' : `₹${stockValue.toLocaleString('en-IN')}`}</div>
+            </div>
+            <IndianRupee size={40} color="var(--warning)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
           </div>
-          <IndianRupee size={40} color="var(--warning)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
         </div>
-      </div>}
+      )}
 
     </div>
   );

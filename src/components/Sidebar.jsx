@@ -31,13 +31,6 @@ export default function Sidebar() {
 
   const visible = navItems.filter(item => !item.roles || item.roles.includes(role));
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch { /* ignore */ }
-  };
-
   return (
     <aside className="sidebar">
       {/* Brand + Role Badge aligned in header */}
@@ -60,7 +53,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav links */}
-      <nav className="sidebar-nav" style={{ flex: 1 }}>
+      <nav className="sidebar-nav">
         {visible.map((item) => (
           <NavLink
             key={item.path}
@@ -76,21 +69,21 @@ export default function Sidebar() {
       </nav>
 
       {/* Sign Out */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-color)' }}>
+      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-color)', marginTop: 'auto' }}>
         <button
-          onClick={handleLogout}
+          onClick={() => { logout(); navigate('/login'); }}
           style={{
             width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
-            padding: '10px 14px', borderRadius: '8px',
-            border: '1px solid var(--border-color)',
-            background: 'transparent', cursor: 'pointer',
-            color: 'var(--text-muted)', fontSize: '0.88rem', fontWeight: 600,
-            transition: 'all 0.15s',
+            padding: '10px 12px', borderRadius: '10px', border: 'none',
+            background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer',
+            fontSize: '0.88rem', fontWeight: 600, transition: 'all 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.borderColor = '#fecaca'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-color)'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#dc2626'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
-          <LogOut size={16} strokeWidth={2} />
+          <div className="nav-icon-container" style={{ background: 'rgba(239,68,68,0.08)' }}>
+            <LogOut size={18} strokeWidth={2.2} color="#ef4444" />
+          </div>
           <span>Sign Out</span>
         </button>
       </div>

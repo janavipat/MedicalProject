@@ -137,6 +137,45 @@ export default function Signup() {
               </div>
             ))}
           </div>
+
+          {/* Medical team illustration */}
+          <div style={{ marginTop: '36px', opacity: 0.85 }}>
+            <svg width="210" height="150" viewBox="0 0 210 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Ground shadow */}
+              <ellipse cx="105" cy="143" rx="70" ry="7" fill="rgba(255,255,255,0.07)"/>
+              {/* Doctor 1 (left) */}
+              <circle cx="72" cy="48" r="20" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2"/>
+              <circle cx="67" cy="45" r="2.5" fill="rgba(255,255,255,0.6)"/>
+              <circle cx="77" cy="45" r="2.5" fill="rgba(255,255,255,0.6)"/>
+              <path d="M67 55 Q72 59 77 55" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+              <path d="M52 82 Q48 104 46 130 L98 130 Q96 104 92 82 Q82 89 72 89 Q62 89 52 82Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+              <rect x="66" y="68" width="12" height="16" rx="6" fill="rgba(255,255,255,0.22)"/>
+              {/* Stethoscope doctor 1 */}
+              <path d="M60 92 Q56 106 58 116 Q60 124 67 125 Q76 127 79 118 Q82 108 79 96" stroke="rgba(255,255,255,0.65)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+              <circle cx="79" cy="95" r="4" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="1.5"/>
+              <circle cx="67" cy="126" r="3" fill="rgba(255,255,255,0.45)" stroke="rgba(255,255,255,0.7)" strokeWidth="1.2"/>
+              {/* Doctor 2 (right) */}
+              <circle cx="138" cy="48" r="20" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2"/>
+              <circle cx="133" cy="45" r="2.5" fill="rgba(255,255,255,0.6)"/>
+              <circle cx="143" cy="45" r="2.5" fill="rgba(255,255,255,0.6)"/>
+              <path d="M133 55 Q138 59 143 55" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+              <path d="M118 82 Q114 104 112 130 L164 130 Q162 104 158 82 Q148 89 138 89 Q128 89 118 82Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+              <rect x="132" y="68" width="12" height="16" rx="6" fill="rgba(255,255,255,0.22)"/>
+              {/* Clipboard doctor 2 */}
+              <rect x="150" y="88" width="22" height="32" rx="3" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+              <rect x="156" y="84" width="10" height="6" rx="2" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
+              <line x1="153" y1="100" x2="170" y2="100" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+              <line x1="153" y1="107" x2="170" y2="107" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+              <line x1="153" y1="114" x2="163" y2="114" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+              {/* Center cross */}
+              <rect x="100" y="70" width="10" height="30" rx="4" fill="rgba(255,255,255,0.0)"/>
+              <circle cx="105" cy="95" r="16" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+              <rect x="102.5" y="88" width="5" height="14" rx="2" fill="rgba(255,255,255,0.8)"/>
+              <rect x="98" y="92.5" width="14" height="5" rx="2" fill="rgba(255,255,255,0.8)"/>
+              {/* Heartbeat */}
+              <path d="M18 143 L38 143 L44 133 L50 153 L56 127 L62 143 L192 143" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
         </div>
       </div>
 
