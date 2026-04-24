@@ -472,8 +472,8 @@ export default function Billing() {
         />
       )}
 
-      {/* ── Stats ──────────────────────────────────────────────────────────── */}
-      <div className="dashboard-grid">
+      {/* ── Stats + Table (hidden while form is open) ───────────────────────── */}
+      {!showCreate && <div className="dashboard-grid">
         <div className="glass-panel stat-card">
           <div className="stat-info">
             <div className="stat-label">Total Revenue Collected</div>
@@ -499,10 +499,10 @@ export default function Billing() {
           </div>
           <CheckCircle size={40} color="var(--text-main)" style={{ position: 'absolute', right: '20px', opacity: 0.1 }} />
         </div>
-      </div>
+      </div>}
 
       {/* ── Bills table ────────────────────────────────────────────────────── */}
-      <div className="glass-panel">
+      {!showCreate && <div className="glass-panel">
         <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
           <div className="input-field" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-input)' }}>
             <Search size={20} color="var(--text-muted)" style={{ marginRight: '10px' }} />
@@ -578,7 +578,7 @@ export default function Billing() {
             </table>
           </div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

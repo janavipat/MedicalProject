@@ -210,6 +210,41 @@ export default function Login() {
             Complete clinic management for modern healthcare
           </p>
 
+          {/* Medical Illustration */}
+          <div style={{ marginBottom: '36px' }}>
+            <svg width="200" height="168" viewBox="0 0 200 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Soft glow circles */}
+              <circle cx="100" cy="84" r="72" fill="rgba(255,255,255,0.03)"/>
+              <circle cx="100" cy="84" r="52" fill="rgba(255,255,255,0.03)"/>
+              {/* Stethoscope — left eartip */}
+              <circle cx="45" cy="22" r="8" fill="rgba(255,255,255,0.45)"/>
+              <path d="M45 30 L45 52" stroke="rgba(255,255,255,0.75)" strokeWidth="5.5" strokeLinecap="round"/>
+              {/* Stethoscope — right eartip */}
+              <circle cx="155" cy="22" r="8" fill="rgba(255,255,255,0.45)"/>
+              <path d="M155 30 L155 52" stroke="rgba(255,255,255,0.75)" strokeWidth="5.5" strokeLinecap="round"/>
+              {/* Binaural arch */}
+              <path d="M45 52 Q45 88 100 88 Q155 88 155 52" stroke="rgba(255,255,255,0.75)" strokeWidth="5.5" fill="none" strokeLinecap="round"/>
+              {/* Tube down */}
+              <path d="M100 88 Q100 114 118 124 Q134 132 136 118 Q138 104 124 101 Q112 98 106 110" stroke="rgba(255,255,255,0.75)" strokeWidth="5.5" fill="none" strokeLinecap="round"/>
+              {/* Chest piece outer ring */}
+              <circle cx="100" cy="112" r="20" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.55)" strokeWidth="2.5"/>
+              {/* Chest piece inner ring */}
+              <circle cx="100" cy="112" r="11" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
+              {/* Chest piece center dot */}
+              <circle cx="100" cy="112" r="4" fill="rgba(255,255,255,0.6)"/>
+              {/* ECG / heartbeat line */}
+              <path d="M6 150 L38 150 L50 129 L60 166 L71 138 L82 150 L194 150" stroke="rgba(255,255,255,0.42)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Medical cross (decorative, top-right) */}
+              <rect x="172" y="28" width="6" height="22" rx="3" fill="rgba(255,255,255,0.28)"/>
+              <rect x="164" y="36" width="22" height="6" rx="3" fill="rgba(255,255,255,0.28)"/>
+              {/* Heart (decorative, top-left) */}
+              <path d="M18 42 Q18 33 26 33 Q34 33 34 42 Q34 51 26 58 Q18 51 18 42Z" fill="rgba(255,255,255,0.22)"/>
+              {/* Pill (decorative, bottom-left) */}
+              <ellipse cx="24" cy="98" rx="16" ry="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" transform="rotate(-30 24 98)"/>
+              <line x1="15" y1="90" x2="33" y2="106" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
+            </svg>
+          </div>
+
           {/* Features */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%', maxWidth: '260px' }}>
             {[

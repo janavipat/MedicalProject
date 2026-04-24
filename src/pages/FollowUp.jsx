@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Clock, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle, MessageSquare } from 'lucide-react';
+import { Clock, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle, MessageSquare, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import CustomSelect from '../components/CustomSelect.jsx';
 import MedicalLoader from '../components/MedicalLoader.jsx';
@@ -224,7 +224,6 @@ export default function FollowUp() {
                 <th>Diagnosis</th>
                 <th>Due Date</th>
                 <th>Contact</th>
-                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -257,20 +256,15 @@ export default function FollowUp() {
                     </td>
                     <td>{hasPhone ? f.contact : '—'}</td>
                     <td>
-                      <span className={`badge ${STATUS_CLASS[f.status] || 'badge-warning'}`}>
-                        {f.status || 'Pending'}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                         {/* SMS button */}
                         <button
                           style={{
-                            padding: '6px 12px', fontSize: '0.82rem',
-                            display: 'flex', alignItems: 'center', gap: '5px',
+                            padding: '5px 10px', fontSize: '0.78rem',
+                            display: 'flex', alignItems: 'center', gap: '4px',
                             background: hasPhone ? '#16a34a' : '#e5e7eb',
                             color: hasPhone ? 'white' : '#9ca3af',
-                            border: 'none', borderRadius: '8px',
+                            border: 'none', borderRadius: '7px',
                             cursor: hasPhone ? 'pointer' : 'not-allowed',
                             fontWeight: 600,
                           }}
@@ -283,20 +277,44 @@ export default function FollowUp() {
                           title={hasPhone ? 'Send SMS reminder' : 'No phone number on record'}
                         >
                           {updatingId === f._id
-                            ? <Loader2 size={13} className="animate-spin" />
-                            : <MessageSquare size={13} />
+                            ? <Loader2 size={12} className="animate-spin" />
+                            : <MessageSquare size={12} />
                           }
                           SMS
                         </button>
 
+                        {/* WhatsApp button */}
+                        <button
+                          style={{
+                            padding: '5px 10px', fontSize: '0.78rem',
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            background: hasPhone ? '#25D366' : '#e5e7eb',
+                            color: hasPhone ? 'white' : '#9ca3af',
+                            border: 'none', borderRadius: '7px',
+                            cursor: hasPhone ? 'pointer' : 'not-allowed',
+                            fontWeight: 600,
+                          }}
+                          onClick={() => {
+                            if (!hasPhone) return;
+                            const phone = (f.contact || '').replace(/\D/g, '');
+                            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(buildSmsMsg(f))}`, '_blank');
+                            updateStatus(f._id, 'Called');
+                          }}
+                          disabled={!hasPhone}
+                          title={hasPhone ? 'Send WhatsApp message' : 'No phone number on record'}
+                        >
+                          <MessageCircle size={12} />
+                          WhatsApp
+                        </button>
+
                         {f.status !== 'Completed' && (
                           <button
-                            className="btn btn-primary"
-                            style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                            className="btn btn-outline"
+                            style={{ padding: '5px 10px', fontSize: '0.78rem' }}
                             onClick={() => updateStatus(f._id, 'Completed')}
                             disabled={updatingId === f._id}
                           >
-                            Done
+                            ✓ Done
                           </button>
                         )}
                       </div>

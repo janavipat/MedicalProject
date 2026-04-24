@@ -116,7 +116,7 @@ export default function Inventory() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button className="btn btn-outline" style={{ display: 'flex', gap: '8px' }} onClick={fetchInventory}><RefreshCw size={16} /> Refresh</button>
-          <button className="btn btn-primary" style={{ display: 'flex', gap: '8px' }} onClick={() => setShowAdd(true)}><PlusCircle size={18} /> Add Medicine</button>
+          {!showAdd && <button className="btn btn-primary" style={{ display: 'flex', gap: '8px' }} onClick={() => setShowAdd(true)}><PlusCircle size={18} /> Add Medicine</button>}
         </div>
       </div>
 
@@ -228,7 +228,7 @@ export default function Inventory() {
         </div>
       )}
 
-      <div className="dashboard-grid">
+      {!showAdd && <div className="dashboard-grid">
         <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--primary)' }}>
           <div className="stat-info">
             <div className="stat-label">Total Items Tracked</div>
@@ -250,9 +250,9 @@ export default function Inventory() {
           </div>
           <IndianRupee size={40} color="var(--warning)" style={{ position: 'absolute', right: '20px', opacity: 0.2 }} />
         </div>
-      </div>
+      </div>}
 
-      <div className="glass-panel">
+      {!showAdd && <div className="glass-panel">
         <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
           <div className="input-field" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-input)' }}>
             <Search size={20} color="var(--text-muted)" style={{ marginRight: '10px' }} />
@@ -356,7 +356,7 @@ export default function Inventory() {
             </table>
           </div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }
