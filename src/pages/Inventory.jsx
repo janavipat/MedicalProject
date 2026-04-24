@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Pill, AlertTriangle, Search, PlusCircle, ArrowDown, ArrowUp, Loader2, RefreshCw, X, Save, IndianRupee } from 'lucide-react';
+import { Pill, AlertTriangle, Search, PlusCircle, Loader2, RefreshCw, X, Save, IndianRupee, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import MedicalLoader from '../components/MedicalLoader.jsx';
 
@@ -162,7 +162,9 @@ export default function Inventory() {
   const [loading, setLoading]     = useState(true);
   const [search, setSearch]       = useState('');
   const [showAdd, setShowAdd]     = useState(false);
-  const [consumingId, setConsumingId] = useState(null);
+  // qty editing: { [id]: { value, saving, saved } }
+  const [qtyEdit, setQtyEdit]     = useState({});
+  const saveTimers = useRef({});
 
   // Lock background scroll when modal is open
   useEffect(() => {
@@ -183,13 +185,32 @@ export default function Inventory() {
 
   useEffect(() => { fetchInventory(); }, [fetchInventory]);
 
-  const consumeOne = async (id) => {
-    setConsumingId(id);
+  // Auto-save qty on blur
+  const handleQtyBlur = async (item) => {
+    const entry = qtyEdit[item._id];
+    if (!entry) return;
+    const newQty = Number(entry.value);
+    if (isNaN(newQty) || newQty < 0 || newQty === item.stockQuantity) {
+      setQtyEdit(p => { const n = { ...p }; delete n[item._id]; return n; });
+      return;
+    }
+    setQtyEdit(p => ({ ...p, [item._id]: { ...p[item._id], saving: true } }));
     try {
-      await authFetch(`${API}/api/inventory/${id}/consume`, { method: 'PATCH', body: JSON.stringify({ quantity: 1 }) });
-      fetchInventory();
-    } catch { alert('Failed to update stock'); }
-    finally { setConsumingId(null); }
+      await authFetch(`${API}/api/inventory/${item._id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ stockQuantity: newQty }),
+      });
+      // Update local state immediately
+      setStock(prev => prev.map(s => s._id === item._id ? { ...s, stockQuantity: newQty } : s));
+      setQtyEdit(p => ({ ...p, [item._id]: { value: String(newQty), saving: false, saved: true } }));
+      // Clear saved indicator after 1.5s
+      saveTimers.current[item._id] = setTimeout(() => {
+        setQtyEdit(p => { const n = { ...p }; delete n[item._id]; return n; });
+      }, 1500);
+    } catch {
+      setQtyEdit(p => { const n = { ...p }; delete n[item._id]; return n; });
+      alert('Failed to update quantity');
+    }
   };
 
   const filtered = stock.filter(item =>
@@ -273,12 +294,12 @@ export default function Inventory() {
                 <th>Price</th>
                 <th>Expiry</th>
                 <th>Status</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((item) => {
                 const status = stockStatus(item);
+                const editing = qtyEdit[item._id];
                 return (
                   <tr key={item._id}>
                     <td>
@@ -287,9 +308,24 @@ export default function Inventory() {
                     </td>
                     <td>{item.formulation || '—'}</td>
                     <td>
-                      <span style={{ fontWeight: 700, color: status === 'Out of Stock' ? '#ef4444' : status === 'Low Stock' ? '#f59e0b' : 'inherit' }}>
-                        {item.stockQuantity}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editing ? editing.value : item.stockQuantity}
+                          onChange={e => setQtyEdit(p => ({ ...p, [item._id]: { value: e.target.value, saving: false, saved: false } }))}
+                          onBlur={() => handleQtyBlur(item)}
+                          onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
+                          style={{
+                            width: '70px', padding: '4px 8px', borderRadius: '6px',
+                            border: editing ? '1.5px solid #16a34a' : '1px solid var(--border-color)',
+                            background: 'var(--bg-input)', color: editing ? '#16a34a' : (status === 'Out of Stock' ? '#ef4444' : status === 'Low Stock' ? '#f59e0b' : 'inherit'),
+                            fontWeight: 700, fontSize: '0.9rem', outline: 'none', textAlign: 'center',
+                          }}
+                        />
+                        {editing?.saving && <Loader2 size={13} className="animate-spin" color="#16a34a" />}
+                        {editing?.saved  && <Check size={13} color="#16a34a" />}
+                      </div>
                     </td>
                     <td>₹{item.price?.toLocaleString('en-IN') || '—'}</td>
                     <td style={{ fontSize: '0.85rem', color: item.expiryDate && new Date(item.expiryDate) < new Date() ? '#ef4444' : 'inherit' }}>
@@ -299,16 +335,6 @@ export default function Inventory() {
                       <span className={`badge ${status === 'In Stock' ? 'badge-success' : status === 'Low Stock' ? 'badge-warning' : 'badge-danger'}`}>
                         {status}
                       </span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-outline"
-                        style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}
-                        onClick={() => consumeOne(item._id)}
-                        disabled={consumingId === item._id || item.stockQuantity === 0}
-                      >
-                        {consumingId === item._id ? <Loader2 size={13} className="animate-spin" /> : <ArrowDown size={13} />} Use 1
-                      </button>
                     </td>
                   </tr>
                 );

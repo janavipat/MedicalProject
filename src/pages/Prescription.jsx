@@ -160,10 +160,26 @@ export default function Prescription() {
       return;
     }
     try {
+      // Try dedicated search endpoint first, fall back to full inventory list
       const res = await authFetch(`${API}/api/inventory/search?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setMedicineSuggestions(prev => ({ ...prev, [rowId]: Array.isArray(data) ? data : [] }));
-    } catch { setMedicineSuggestions(prev => ({ ...prev, [rowId]: [] })); }
+      let data = await res.json();
+      // Handle both array and { items: [] } / { medicines: [] } shapes
+      if (!Array.isArray(data)) data = data.items || data.medicines || data.data || [];
+      // If search endpoint returned nothing, filter from local stock via full list
+      if (data.length === 0) {
+        const r2 = await authFetch(`${API}/api/inventory`);
+        const all = await r2.json();
+        const list = Array.isArray(all) ? all : [];
+        data = list.filter(m =>
+          m.medicineName?.toLowerCase().includes(query.toLowerCase()) ||
+          m.brand?.toLowerCase().includes(query.toLowerCase()) ||
+          m.formulation?.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+      setMedicineSuggestions(prev => ({ ...prev, [rowId]: data.slice(0, 10) }));
+    } catch {
+      setMedicineSuggestions(prev => ({ ...prev, [rowId]: [] }));
+    }
   };
 
   const selectMedicine = (id, medicineName, inventoryId) => {
