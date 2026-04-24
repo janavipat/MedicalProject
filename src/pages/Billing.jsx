@@ -123,10 +123,10 @@ function CreateReceiptForm({ onClose, onSaved, authFetch }) {
       {/* Accent bar */}
       <div style={{ height: '4px', background: 'linear-gradient(90deg, #16a34a, #22c55e, #4ade80)', flexShrink: 0 }} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr' }}>
 
-        {/* ── LEFT: form ─────────────────────────────────────────────────────── */}
-        <div style={{ padding: '28px 32px', borderRight: '1px solid #f0fdf4', overflowY: 'auto', maxHeight: '78vh' }}>
+        {/* ── form ───────────────────────────────────────────────────────────── */}
+        <div style={{ padding: '28px 32px', overflowY: 'auto', maxHeight: '78vh' }}>
 
           {/* Header row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
@@ -351,39 +351,6 @@ function CreateReceiptForm({ onClose, onSaved, authFetch }) {
               </div>
             </>
           )}
-        </div>
-
-        {/* ── RIGHT: tips ────────────────────────────────────────────────────── */}
-        <div style={{ background: 'linear-gradient(180deg, #f0fdf4 0%, #f8fafc 100%)', padding: '32px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <Info size={16} color="#16a34a" />
-            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#15803d' }}>Billing Tips</span>
-          </div>
-
-          {[
-            { icon: '🔍', title: 'Search patients', desc: 'Type 2+ characters to find existing patients. New names are auto-registered.' },
-            { icon: '📋', title: 'Multiple items', desc: 'Add as many line items as needed — consultations, medicines, procedures, etc.' },
-            { icon: '💳', title: 'Payment methods', desc: 'Select Cash, UPI, Card, or Other. You can also leave as unpaid and collect later.' },
-            { icon: '✅', title: 'Mark as paid', desc: 'Check "Mark as Paid Now" if the patient paid on the spot.' },
-            { icon: '📝', title: 'Notes', desc: 'Add any extra info — insurance claims, partial payments, or special instructions.' },
-          ].map((tip, i) => (
-            <div key={i} style={{ marginBottom: '18px', padding: '14px', background: 'white', borderRadius: '10px', border: '1px solid #dcfce7', boxShadow: '0 1px 4px rgba(22,163,74,0.06)' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: '1px' }}>{tip.icon}</span>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#1a2e25', marginBottom: '3px' }}>{tip.title}</div>
-                  <div style={{ fontSize: '0.78rem', color: '#6b7280', lineHeight: 1.5 }}>{tip.desc}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          <div style={{ marginTop: '8px', padding: '12px', background: '#f0fdf4', borderRadius: '10px', border: '1px solid #86efac' }}>
-            <div style={{ fontSize: '0.75rem', color: '#15803d', fontWeight: 600, marginBottom: '4px' }}>💡 Quick shortcut</div>
-            <div style={{ fontSize: '0.75rem', color: '#374151', lineHeight: 1.5 }}>
-              If a patient name is not found, a new patient record is automatically created so you never lose a billing entry.
-            </div>
-          </div>
         </div>
 
       </div>

@@ -16,7 +16,6 @@ const navItems = [
   { path: '/billing',     label: 'Billing & Payments', icon: IndianRupee },
   { path: '/follow-ups',  label: 'Follow-ups',         icon: Clock },
   { path: '/service',     label: 'Help & Support',     icon: HeadphonesIcon },
-  { path: '/signup',      label: 'Register Staff',     icon: UserPlus, roles: ['Receptionist'] },
 ];
 
 const ROLE_BADGES = {

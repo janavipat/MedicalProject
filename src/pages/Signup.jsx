@@ -153,10 +153,10 @@ export default function Signup() {
         <div style={{ width: '100%', maxWidth: '420px' }}>
 
           <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', margin: '0 0 6px', letterSpacing: '-0.03em' }}>
-            Create Staff Account
+            Create Account
           </h2>
           <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0 0 28px' }}>
-            Register as MediCore staff
+            Register as MediCore
           </p>
 
           {error && (
