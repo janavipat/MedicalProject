@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 const API = 'https://medical-project-h6yc.vercel.app';
 
 const emptyForm = () => ({
-  name: '', age: '', gender: 'Male', phone: '', address: '', bloodGroup: '', weight: '', diagnosis: '',
+  name: '', age: '', gender: 'Male', phone: '', address: '', bloodGroup: '', weight: '', diagnosis: '', followUpDate: '',
 });
 
 const emptyMed = () => ({ id: Date.now() + Math.random(), name: '', timing: '', anupan: '', days: 7 });
@@ -262,7 +262,24 @@ export default function Prescription() {
                 }
               } catch { /* non-critical — prescription still saved */ }
             }
-            showAlert('Prescription Saved', `Prescription saved successfully for ${patientData.name}`, 'success');
+            // Auto-create follow-up if a date was provided
+            if (patientData.followUpDate) {
+              try {
+                await authFetch(`${API}/api/followup`, {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    patientId,
+                    patientName: patientData.name,
+                    diagnosis:   patientData.diagnosis || '',
+                    phone:       patientData.phone || '',
+                    followUpDate: patientData.followUpDate,
+                    status: 'Pending',
+                  }),
+                });
+              } catch { /* non-critical */ }
+            }
+
+            showAlert('Prescription Saved', `Prescription saved successfully for ${patientData.name}${patientData.followUpDate ? `\nFollow-up scheduled on ${new Date(patientData.followUpDate).toLocaleDateString('en-IN')}` : ''}`, 'success');
           } else {
             const err = await pr.json();
             showAlert('Error', `Error saving prescription: ${err.error || 'Unknown error'}`, 'danger');
@@ -392,8 +409,8 @@ export default function Prescription() {
             </div>
           </div>
 
-          {/* Patient Info Row 2: Address + Blood Group + Weight */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
+          {/* Patient Info Row 2: Address + Blood Group + Weight + Follow-up Date */}
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px' }}>
             <div className="input-group">
               <label className="input-label">Address</label>
               <input type="text" className="input-field" placeholder="Patient's address"
@@ -419,6 +436,13 @@ export default function Prescription() {
               <label className="input-label">Weight (kg)</label>
               <input type="number" className="input-field" placeholder="e.g. 65" min="1" max="300"
                 value={patientData.weight} onChange={e => setPatientData(p => ({ ...p, weight: e.target.value }))} />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Follow-up Date</label>
+              <input type="date" className="input-field"
+                value={patientData.followUpDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={e => setPatientData(p => ({ ...p, followUpDate: e.target.value }))} />
             </div>
           </div>
 

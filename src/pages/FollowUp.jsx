@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Clock, PhoneCall, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle } from 'lucide-react';
+import { Clock, PhoneCall, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import MedicalLoader from '../components/MedicalLoader.jsx';
 
@@ -21,6 +21,7 @@ export default function FollowUp() {
   const [search, setSearch]       = useState('');
   const [filter, setFilter]       = useState('all');
   const [updatingId, setUpdatingId] = useState(null);
+  const [todayFollowups, setTodayFollowups] = useState([]);
 
   const fetchFollowups = useCallback(async () => {
     setLoading(true); setError('');
@@ -32,7 +33,14 @@ export default function FollowUp() {
       const r = await authFetch(url);
       if (!r.ok) throw new Error();
       const data = await r.json();
-      setFollowups(Array.isArray(data.followups) ? data.followups : Array.isArray(data) ? data : []);
+      const list = Array.isArray(data.followups) ? data.followups : Array.isArray(data) ? data : [];
+      setFollowups(list);
+      // Detect today's follow-ups
+      const todayStr = new Date().toISOString().split('T')[0];
+      setTodayFollowups(list.filter(f => {
+        const d = f.followUpDate || f.date;
+        return d && d.slice(0, 10) === todayStr && f.status !== 'Called' && f.status !== 'Completed';
+      }));
     } catch {
       setError('Could not load follow-ups. Check backend connection.');
     } finally {
@@ -58,6 +66,14 @@ export default function FollowUp() {
 
   const isOverdue = (dateStr) => new Date(dateStr) < new Date() && true;
 
+  const sendWhatsApp = (f) => {
+    const phone = (f.phone || f.contact || '').replace(/\D/g, '');
+    if (!phone) { alert('No phone number available for this patient.'); return; }
+    const date = new Date(f.followUpDate || f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const msg = `Dear ${f.patientName}, this is a reminder from MediCore Clinic.\n\nYour follow-up appointment is scheduled for today (${date}).\n\nDiagnosis: ${f.diagnosis || '—'}\n\nPlease visit the clinic at your scheduled time.\n\nThank you.`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="page-header">
@@ -73,6 +89,33 @@ export default function FollowUp() {
       {error && (
         <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', padding: '10px 16px', marginBottom: '16px', fontSize: '0.84rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <AlertCircle size={16} color="#f59e0b" /> {error}
+        </div>
+      )}
+
+      {/* Today's follow-up alert banner */}
+      {todayFollowups.length > 0 && (
+        <div style={{ background: 'linear-gradient(135deg,#dcfce7,#bbf7d0)', border: '1px solid #86efac', borderRadius: '12px', padding: '14px 18px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <CalendarIcon size={18} color="#16a34a" />
+            <span style={{ fontWeight: 700, color: '#15803d', fontSize: '0.95rem' }}>
+              {todayFollowups.length} follow-up{todayFollowups.length > 1 ? 's' : ''} due today
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {todayFollowups.map(f => (
+              <div key={f._id} style={{ background: 'white', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#1a2e25' }}>{f.patientName}</span>
+                {(f.phone || f.contact) && (
+                  <button
+                    onClick={() => sendWhatsApp(f)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#25D366', color: 'white', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    <MessageCircle size={13} /> WhatsApp
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -151,7 +194,7 @@ export default function FollowUp() {
                       <span className={`badge ${STATUS_CLASS[f.status] || 'badge-warning'}`}>{f.status || 'Pending'}</span>
                     </td>
                     <td>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <button
                           className="btn btn-outline"
                           style={{ padding: '6px 12px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}
@@ -160,6 +203,14 @@ export default function FollowUp() {
                         >
                           {updatingId === f._id ? <Loader2 size={13} className="animate-spin" /> : <PhoneCall size={13} />} Call Log
                         </button>
+                        {(f.phone || f.contact) && (
+                          <button
+                            style={{ padding: '6px 12px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px', background: '#25D366', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                            onClick={() => sendWhatsApp(f)}
+                          >
+                            <MessageCircle size={13} /> WhatsApp
+                          </button>
+                        )}
                         {f.status !== 'Completed' && (
                           <button
                             className="btn btn-primary"
