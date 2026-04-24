@@ -87,7 +87,9 @@ export default function Prescription() {
   };
 
   const selectPatient = (p) => {
-    setPatientData({
+    // Spread prev so follow-up date (and any other typed fields) are preserved
+    setPatientData(prev => ({
+      ...prev,
       name:       p.name       || '',
       age:        p.age        ? String(p.age) : '',
       gender:     p.gender     || 'Male',
@@ -95,8 +97,8 @@ export default function Prescription() {
       address:    p.address    || '',
       bloodGroup: p.bloodGroup || '',
       weight:     p.weight     ? String(p.weight) : '',
-      diagnosis:  patientData.diagnosis,
-    });
+      diagnosis:  prev.diagnosis,
+    }));
     setLinkedAppointment(prev => prev ? prev : { patientId: p._id });
     setPatientSuggestions([]);
     setShowPatientSug(false);
@@ -120,7 +122,9 @@ export default function Prescription() {
         .then(r => r.ok ? r.json() : null)
         .then(p => {
           if (p) {
-            setPatientData({
+            // Spread prev to preserve followUpDate already typed by user
+            setPatientData(prev => ({
+              ...prev,
               ...base,
               age:        p.age        ? String(p.age) : '',
               gender:     p.gender     || 'Male',
@@ -128,9 +132,9 @@ export default function Prescription() {
               address:    p.address    || '',
               bloodGroup: p.bloodGroup || '',
               weight:     p.weight     ? String(p.weight) : '',
-            });
+            }));
           } else {
-            setPatientData(base);
+            setPatientData(prev => ({ ...prev, ...base }));
           }
         })
         .catch(() => setPatientData(base));
@@ -280,10 +284,11 @@ export default function Prescription() {
               } catch { /* non-critical — prescription still saved */ }
             }
             // Auto-create follow-up if a date was provided
+            let followUpNote = '';
             if (patientData.followUpDate) {
               try {
                 const contact = patientData.phone?.trim() || '0000000000';
-                await authFetch(`${API}/api/followup`, {
+                const fuRes = await authFetch(`${API}/api/followup`, {
                   method: 'POST',
                   body: JSON.stringify({
                     patientId,
@@ -294,10 +299,25 @@ export default function Prescription() {
                     status:    'Pending',
                   }),
                 });
-              } catch { /* non-critical */ }
+                if (fuRes.ok) {
+                  const fuDate = new Date(patientData.followUpDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                  followUpNote = `\nFollow-up scheduled on ${fuDate}.`;
+                } else {
+                  const fuErr = await fuRes.json().catch(() => ({}));
+                  console.error('Follow-up creation failed:', fuRes.status, fuErr);
+                  followUpNote = `\n⚠️ Follow-up could not be saved: ${fuErr.error || `Server error ${fuRes.status}`}`;
+                }
+              } catch (e) {
+                console.error('Follow-up creation error:', e);
+                followUpNote = '\n⚠️ Follow-up could not be saved (network error).';
+              }
             }
 
-            showAlert('Prescription Saved', `Prescription saved successfully for ${patientData.name}${patientData.followUpDate ? `\nFollow-up scheduled on ${new Date(patientData.followUpDate).toLocaleDateString('en-IN')}` : ''}`, 'success');
+            showAlert(
+              'Prescription Saved',
+              `Prescription saved successfully for ${patientData.name}.${followUpNote}`,
+              followUpNote.startsWith('\n⚠️') ? 'warning' : 'success'
+            );
           } else {
             const err = await pr.json();
             showAlert('Error', `Error saving prescription: ${err.error || 'Unknown error'}`, 'danger');

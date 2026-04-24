@@ -56,7 +56,7 @@ export default function FollowUp() {
         })
       );
     } catch (e) {
-      setError(`Could not load follow-ups: ${e.message}`);
+      setError(`Could not load follow-ups: ${e.message}. Check your internet connection or try refreshing.`);
     } finally {
       setLoading(false);
     }
