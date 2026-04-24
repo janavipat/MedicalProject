@@ -318,11 +318,6 @@ export default function Prescription() {
         <div className="page-header" style={{ marginBottom: '20px' }}>
           <div>
             <h1 className="page-title">Digital Prescription</h1>
-            <p className="page-subtitle">
-              {linkedAppointment
-                ? `Consultation — Token #${linkedAppointment.tokenNumber} · ${linkedAppointment.reason || 'General'}`
-                : 'Generate smart Ayurvedic prescriptions'}
-            </p>
           </div>
           <button className="btn btn-primary" onClick={handleNew} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '0.875rem' }}>
             <Plus size={16} /> New Prescription

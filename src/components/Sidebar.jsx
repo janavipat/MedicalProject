@@ -12,7 +12,6 @@ const navItems = [
   { path: '/appointments',label: 'Appointments',       icon: Calendar },
   { path: '/patients',    label: 'Patients',           icon: Users },
   { path: '/prescription',label: 'Prescriptions',      icon: FileEdit,   roles: ['Doctor'] },
-  { path: '/diseases',    label: 'Disease Manager',    icon: BookOpen,   roles: ['Doctor'] },
   { path: '/inventory',   label: 'Medicine Inventory', icon: Pill },
   { path: '/billing',     label: 'Billing & Payments', icon: IndianRupee },
   { path: '/follow-ups',  label: 'Follow-ups',         icon: Clock },
