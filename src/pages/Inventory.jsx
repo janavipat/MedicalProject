@@ -254,6 +254,107 @@ export default function Inventory() {
         </div>
       )}
 
+      {!showAdd && (
+        <div className="glass-panel">
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+            <div className="input-field" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-input)' }}>
+              <Search size={20} color="var(--text-muted)" style={{ marginRight: '10px' }} />
+              <input
+                type="text"
+                placeholder="Search by medicine name, brand or formulation..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-main)', width: '100%', outline: 'none' }}
+              />
+              {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}><X size={15} /></button>}
+            </div>
+          </div>
+
+          {loading ? (
+            <MedicalLoader text="Loading inventory…" />
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
+              <Pill size={40} color="#e5e7eb" style={{ marginBottom: '10px' }} />
+              <div>{search ? 'No medicines match your search.' : 'No medicines in inventory. Add one above.'}</div>
+            </div>
+          ) : (
+            <div style={{ overflowY: 'auto', maxHeight: '520px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <table className="data-table" style={{ marginBottom: 0 }}>
+                <thead style={{ position: 'sticky', top: 0, zIndex: 2, background: 'var(--bg-muted)' }}>
+                  <tr>
+                    <th>Medicine Name & Brand</th>
+                    <th>Formulation</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Expiry</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((item) => {
+                    const status  = stockStatus(item);
+                    const editing = qtyEdit[item._id];
+                    const isLow   = item.stockQuantity <= (item.lowStockThreshold || 10);
+                    const isOut   = item.stockQuantity === 0;
+                    return (
+                      <tr
+                        key={item._id}
+                        style={{
+                          background: isOut ? 'rgba(239,68,68,0.07)' : isLow ? 'rgba(245,158,11,0.08)' : undefined,
+                          borderLeft: isOut ? '3px solid #ef4444' : isLow ? '3px solid #f59e0b' : '3px solid transparent',
+                        }}
+                      >
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {isLow && (
+                              <AlertTriangle size={14} color={isOut ? '#ef4444' : '#f59e0b'} style={{ flexShrink: 0 }} title={isOut ? 'Out of stock!' : 'Low stock'} />
+                            )}
+                            <div>
+                              <div style={{ fontWeight: '600' }}>{item.medicineName}</div>
+                              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.brand || '—'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{item.formulation || '—'}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <input
+                              type="number" min="0"
+                              value={editing ? editing.value : item.stockQuantity}
+                              onChange={e => setQtyEdit(p => ({ ...p, [item._id]: { value: e.target.value, saving: false, saved: false } }))}
+                              onBlur={() => handleQtyBlur(item)}
+                              onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
+                              style={{
+                                width: '70px', padding: '4px 8px', borderRadius: '6px',
+                                border: editing ? '1.5px solid #16a34a' : `1px solid ${isOut ? '#fecaca' : isLow ? '#fde68a' : 'var(--border-color)'}`,
+                                background: editing ? 'white' : isOut ? 'rgba(239,68,68,0.08)' : isLow ? 'rgba(245,158,11,0.08)' : 'var(--bg-input)',
+                                color: editing ? '#16a34a' : isOut ? '#ef4444' : isLow ? '#b45309' : 'inherit',
+                                fontWeight: 700, fontSize: '0.9rem', outline: 'none', textAlign: 'center',
+                              }}
+                            />
+                            {editing?.saving && <Loader2 size={13} className="animate-spin" color="#16a34a" />}
+                            {editing?.saved  && <Check size={13} color="#16a34a" />}
+                          </div>
+                        </td>
+                        <td>₹{item.price?.toLocaleString('en-IN') || '—'}</td>
+                        <td style={{ fontSize: '0.85rem', color: item.expiryDate && new Date(item.expiryDate) < new Date() ? '#ef4444' : 'inherit' }}>
+                          {item.expiryDate ? new Date(item.expiryDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}
+                        </td>
+                        <td>
+                          <span className={`badge ${status === 'In Stock' ? 'badge-success' : status === 'Low Stock' ? 'badge-warning' : 'badge-danger'}`}>
+                            {status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
