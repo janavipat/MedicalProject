@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Clock, PhoneCall, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle, MessageCircle } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Clock, Calendar as CalendarIcon, Search, User, Loader2, RefreshCw, X, AlertCircle, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import CustomSelect from '../components/CustomSelect.jsx';
 import MedicalLoader from '../components/MedicalLoader.jsx';
@@ -23,11 +23,32 @@ export default function FollowUp() {
   const [filter, setFilter]                 = useState('all');
   const [updatingId, setUpdatingId]         = useState(null);
   const [todayFollowups, setTodayFollowups] = useState([]);
+  const autoSmsTriggered                    = useRef(false);
+
+  const buildSmsMsg = (f) => {
+    const date = f.dueDate
+      ? new Date(f.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+      : 'today';
+    return (
+      `Dear ${f.patientName}, this is a reminder from MediCore Clinic. ` +
+      `Your follow-up appointment is scheduled for ${date}. ` +
+      (f.diagnosis ? `Diagnosis: ${f.diagnosis}. ` : '') +
+      `Please visit the clinic at your scheduled time. Thank you.`
+    );
+  };
+
+  const sendSms = (f) => {
+    const phone = (f.contact || '').replace(/\D/g, '');
+    if (!phone || phone === '0000000000') {
+      alert('No phone number available for this patient.');
+      return;
+    }
+    window.location.href = `sms:${phone}?body=${encodeURIComponent(buildSmsMsg(f))}`;
+  };
 
   const fetchFollowups = useCallback(async () => {
     setLoading(true); setError('');
     try {
-      // Correct filter param: ?filter=today / week / overdue
       let url = `${API}/api/followup`;
       if (filter === 'today')   url += '?filter=today';
       if (filter === '7days')   url += '?filter=week';
@@ -37,8 +58,6 @@ export default function FollowUp() {
       if (!r.ok) throw new Error(`API returned ${r.status}`);
 
       const data = await r.json();
-
-      // API returns a plain array
       const list = Array.isArray(data) ? data :
                    Array.isArray(data.followUps)  ? data.followUps :
                    Array.isArray(data.followups)  ? data.followups :
@@ -46,15 +65,13 @@ export default function FollowUp() {
 
       setFollowups(list);
 
-      // Detect today's due follow-ups (field is dueDate)
       const todayStr = new Date().toISOString().split('T')[0];
-      setTodayFollowups(
-        list.filter(f => {
-          const d = f.dueDate;
-          return d && new Date(d).toISOString().split('T')[0] === todayStr
-            && f.status !== 'Called' && f.status !== 'Completed';
-        })
-      );
+      const todays   = list.filter(f => {
+        const d = f.dueDate;
+        return d && new Date(d).toISOString().split('T')[0] === todayStr
+          && f.status !== 'Called' && f.status !== 'Completed';
+      });
+      setTodayFollowups(todays);
     } catch (e) {
       setError(`Could not load follow-ups: ${e.message}. Check your internet connection or try refreshing.`);
     } finally {
@@ -63,6 +80,28 @@ export default function FollowUp() {
   }, [authFetch, filter]);
 
   useEffect(() => { fetchFollowups(); }, [fetchFollowups]);
+
+  // Auto-send SMS once per session for today's follow-up patients with a phone number
+  useEffect(() => {
+    if (autoSmsTriggered.current) return;
+    if (todayFollowups.length === 0) return;
+
+    const withPhone = todayFollowups.filter(f => {
+      const p = (f.contact || '').replace(/\D/g, '');
+      return p && p !== '0000000000';
+    });
+    if (withPhone.length === 0) return;
+
+    autoSmsTriggered.current = true;
+
+    // Open SMS for first due patient; for subsequent ones open after a short delay
+    withPhone.forEach((f, idx) => {
+      setTimeout(() => {
+        const phone = (f.contact || '').replace(/\D/g, '');
+        window.location.href = `sms:${phone}?body=${encodeURIComponent(buildSmsMsg(f))}`;
+      }, idx * 600);
+    });
+  }, [todayFollowups]);
 
   const updateStatus = async (id, status) => {
     setUpdatingId(id);
@@ -74,22 +113,6 @@ export default function FollowUp() {
       fetchFollowups();
     } catch { alert('Failed to update status'); }
     finally { setUpdatingId(null); }
-  };
-
-  // WhatsApp reminder using correct `contact` field
-  const sendWhatsApp = (f) => {
-    const phone = (f.contact || '').replace(/\D/g, '');
-    if (!phone || phone === '0000000000') {
-      alert('No phone number available for this patient.');
-      return;
-    }
-    const date = new Date(f.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-    const msg =
-      `Dear ${f.patientName}, this is a reminder from MediCore Clinic.\n\n` +
-      `Your follow-up appointment is scheduled for *${date}*.\n\n` +
-      `Diagnosis: ${f.diagnosis || '—'}\n\n` +
-      `Please visit the clinic at your scheduled time.\n\nThank you.`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const filtered = followups.filter(f =>
@@ -104,7 +127,7 @@ export default function FollowUp() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Follow-up Management</h1>
-          <p className="page-subtitle">Track returning patients and schedule reminder calls</p>
+          <p className="page-subtitle">Track returning patients and send SMS reminders</p>
         </div>
         <button className="btn btn-outline" style={{ display: 'flex', gap: '6px' }} onClick={fetchFollowups}>
           <RefreshCw size={15} /> Refresh
@@ -123,7 +146,7 @@ export default function FollowUp() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <CalendarIcon size={18} color="#16a34a" />
             <span style={{ fontWeight: 700, color: '#15803d', fontSize: '0.95rem' }}>
-              {todayFollowups.length} follow-up{todayFollowups.length > 1 ? 's' : ''} due today
+              {todayFollowups.length} follow-up{todayFollowups.length > 1 ? 's' : ''} due today — SMS reminders sent automatically
             </span>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -132,10 +155,10 @@ export default function FollowUp() {
                 <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#1a2e25' }}>{f.patientName}</span>
                 {f.contact && f.contact !== '0000000000' && (
                   <button
-                    onClick={() => sendWhatsApp(f)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#25D366', color: 'white', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
+                    onClick={() => sendSms(f)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
                   >
-                    <MessageCircle size={13} /> WhatsApp
+                    <MessageSquare size={13} /> Send SMS
                   </button>
                 )}
               </div>
@@ -209,6 +232,7 @@ export default function FollowUp() {
               {filtered.map((f, i) => {
                 const due     = f.dueDate;
                 const overdue = due && isOverdue(due) && f.status !== 'Called' && f.status !== 'Completed';
+                const hasPhone = f.contact && f.contact !== '0000000000';
                 return (
                   <tr key={f._id || i}>
                     <td>
@@ -231,7 +255,7 @@ export default function FollowUp() {
                         )}
                       </span>
                     </td>
-                    <td>{f.contact && f.contact !== '0000000000' ? f.contact : '—'}</td>
+                    <td>{hasPhone ? f.contact : '—'}</td>
                     <td>
                       <span className={`badge ${STATUS_CLASS[f.status] || 'badge-warning'}`}>
                         {f.status || 'Pending'}
@@ -239,28 +263,32 @@ export default function FollowUp() {
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {/* SMS button */}
                         <button
-                          className="btn btn-outline"
-                          style={{ padding: '6px 12px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                          style={{
+                            padding: '6px 12px', fontSize: '0.82rem',
+                            display: 'flex', alignItems: 'center', gap: '5px',
+                            background: hasPhone ? '#16a34a' : '#e5e7eb',
+                            color: hasPhone ? 'white' : '#9ca3af',
+                            border: 'none', borderRadius: '8px',
+                            cursor: hasPhone ? 'pointer' : 'not-allowed',
+                            fontWeight: 600,
+                          }}
                           onClick={() => {
-                            const phone = (f.contact || '').replace(/\D/g, '');
-                            if (phone && phone !== '0000000000') {
-                              window.location.href = `tel:${phone}`;
-                            }
+                            if (!hasPhone) return;
+                            sendSms(f);
                             updateStatus(f._id, 'Called');
                           }}
-                          disabled={updatingId === f._id || f.status === 'Called'}
+                          disabled={updatingId === f._id || !hasPhone}
+                          title={hasPhone ? 'Send SMS reminder' : 'No phone number on record'}
                         >
-                          {updatingId === f._id ? <Loader2 size={13} className="animate-spin" /> : <PhoneCall size={13} />} Call
+                          {updatingId === f._id
+                            ? <Loader2 size={13} className="animate-spin" />
+                            : <MessageSquare size={13} />
+                          }
+                          SMS
                         </button>
-                        {f.contact && f.contact !== '0000000000' && (
-                          <button
-                            style={{ padding: '6px 12px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px', background: '#25D366', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-                            onClick={() => sendWhatsApp(f)}
-                          >
-                            <MessageCircle size={13} /> WhatsApp
-                          </button>
-                        )}
+
                         {f.status !== 'Completed' && (
                           <button
                             className="btn btn-primary"
