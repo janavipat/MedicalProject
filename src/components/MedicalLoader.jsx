@@ -151,20 +151,6 @@ export default function MedicalLoader({ text, variant = 'section' }) {
           </div>
         )}
 
-        {/* ── Label + animated dots ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: '#5a7a68', fontSize: isPage ? '0.95rem' : '0.87rem', fontWeight: 500 }}>
-            {label}
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 1 }}>
-            {['med-dot-1','med-dot-2','med-dot-3'].map(cls => (
-              <span key={cls} className={cls} style={{
-                display: 'inline-block', width: 4, height: 4,
-                borderRadius: '50%', background: '#2d8653',
-              }} />
-            ))}
-          </span>
-        </div>
       </div>
     </>
   );
