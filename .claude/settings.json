@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"D:/janavi/MedicalProject-main/MedicalProject-main\" && git add -A && git commit -m \"auto: save changes\" 2>/dev/null; git push origin frontend 2>/dev/null; true"
+          }
+        ]
+      }
+    ]
+  }
+}
