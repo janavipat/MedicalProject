@@ -221,7 +221,7 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
             <div className="input-group" style={{ margin: 0 }}>
               <label className="input-label">Bill Type</label>
-              <CustomSelect value={billType} onChange={setBillType} width="100%"
+              <CustomSelect value={billType} onChange={setBillType} width="100%" matchInput
                 options={[
                   { value: 'Consultation', label: 'Consultation' },
                   { value: 'Medicine',     label: 'Medicine' },
@@ -231,7 +231,7 @@ function CreateReceiptModal({ onClose, onSaved, authFetch }) {
             </div>
             <div className="input-group" style={{ margin: 0 }}>
               <label className="input-label">Payment Method</label>
-              <CustomSelect value={paymentMethod} onChange={setPayMethod} width="100%"
+              <CustomSelect value={paymentMethod} onChange={setPayMethod} width="100%" matchInput
                 options={[
                   { value: 'Cash',  label: 'Cash' },
                   { value: 'UPI',   label: 'UPI' },

@@ -607,7 +607,7 @@ function ReceptionistView({ queue, onAddAppointment }) {
                 </div>
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Gender</label>
-                  <CustomSelect value={form.gender} onChange={v => set('gender', v)} width="100%"
+                  <CustomSelect value={form.gender} onChange={v => set('gender', v)} width="100%" matchInput
                     options={[
                       { value: 'Male',   label: 'Male' },
                       { value: 'Female', label: 'Female' },
@@ -623,7 +623,7 @@ function ReceptionistView({ queue, onAddAppointment }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Blood Group</label>
-                  <CustomSelect value={form.bloodGroup} onChange={v => set('bloodGroup', v)} width="100%"
+                  <CustomSelect value={form.bloodGroup} onChange={v => set('bloodGroup', v)} width="100%" matchInput
                     placeholder="Unknown"
                     options={[
                       { value: '',    label: 'Unknown' },

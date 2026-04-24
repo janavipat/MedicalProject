@@ -411,7 +411,7 @@ export default function Prescription() {
             </div>
             <div className="input-group">
               <label className="input-label">Gender</label>
-              <CustomSelect value={patientData.gender} onChange={v => setPatientData(p => ({ ...p, gender: v }))} width="100%"
+              <CustomSelect value={patientData.gender} onChange={v => setPatientData(p => ({ ...p, gender: v }))} width="100%" matchInput
                 options={[
                   { value: 'Male',   label: 'Male' },
                   { value: 'Female', label: 'Female' },
@@ -434,7 +434,7 @@ export default function Prescription() {
             </div>
             <div className="input-group">
               <label className="input-label">Blood Group</label>
-              <CustomSelect value={patientData.bloodGroup} onChange={v => setPatientData(p => ({ ...p, bloodGroup: v }))} width="100%"
+              <CustomSelect value={patientData.bloodGroup} onChange={v => setPatientData(p => ({ ...p, bloodGroup: v }))} width="100%" matchInput
                 placeholder="Unknown"
                 options={[
                   { value: '',    label: 'Unknown' },

@@ -259,6 +259,7 @@ export default function FollowUp() {
             value={filter}
             onChange={setFilter}
             minWidth="180px"
+            matchInput
             options={[
               { value: 'all',     label: 'All Follow-ups' },
               { value: 'today',   label: 'Due Today',    color: '#16a34a', bg: '#f0fdf4' },

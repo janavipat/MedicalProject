@@ -5,13 +5,14 @@ import { ChevronDown } from 'lucide-react';
  * CustomSelect — card-style dropdown matching Dashboard filter style.
  *
  * Props:
- *  value      — current selected value (string)
- *  onChange   — (value) => void
- *  options    — [{ value, label, color?, bg? }]
+ *  value       — current selected value (string)
+ *  onChange    — (value) => void
+ *  options     — [{ value, label, color?, bg? }]
  *  placeholder — shown when nothing selected
- *  minWidth   — trigger button min-width (default '140px')
- *  width      — full width override (e.g. '100%')
- *  style      — extra styles on the wrapper
+ *  minWidth    — trigger button min-width (default '140px')
+ *  width       — full width override (e.g. '100%')
+ *  style       — extra styles on the wrapper
+ *  matchInput  — use same padding as .input-field (12px 16px) for height consistency
  */
 export default function CustomSelect({
   value,
@@ -21,6 +22,7 @@ export default function CustomSelect({
   minWidth = '140px',
   width,
   style = {},
+  matchInput = false,
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -45,7 +47,7 @@ export default function CustomSelect({
         onClick={() => setOpen(o => !o)}
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
-          padding: '7px 14px',
+          padding: matchInput ? '12px 16px' : '7px 14px',
           border: `1.5px solid ${hasValue ? (selected?.color || '#86efac') : 'var(--border-color)'}`,
           borderRadius: '10px',
           background: hasValue ? (selected?.bg || '#f0fdf4') : 'var(--bg-input, #f9fafb)',
