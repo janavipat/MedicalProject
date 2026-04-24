@@ -112,7 +112,7 @@ export default function Signup() {
           </div>
 
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', textAlign: 'center' }}>
-            Apollo Clinic
+            MediCore
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: '1.6', margin: '0 0 48px', maxWidth: '260px' }}>
             Join our team and help deliver world-class healthcare
@@ -156,7 +156,7 @@ export default function Signup() {
             Create Staff Account
           </h2>
           <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0 0 28px' }}>
-            Register as Apollo Clinic staff
+            Register as MediCore staff
           </p>
 
           {error && (

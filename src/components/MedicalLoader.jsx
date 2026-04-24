@@ -7,7 +7,7 @@
 export default function MedicalLoader({ text, variant = 'section' }) {
   const isPage = variant === 'page';
 
-  const defaultText = isPage ? 'Initializing Apollo Clinic…' : 'Loading…';
+  const defaultText = isPage ? 'Initializing MediCore…' : 'Loading…';
   const label = text ?? defaultText;
 
   const circleSize  = isPage ? 88 : 64;
@@ -143,7 +143,7 @@ export default function MedicalLoader({ text, variant = 'section' }) {
         {isPage && (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a2e25', letterSpacing: '-0.03em' }}>
-              Apollo Clinic
+              MediCore
             </div>
             <div style={{ fontSize: '0.78rem', color: '#5a7a68', fontWeight: 500, marginTop: 2 }}>
               Clinic Management System

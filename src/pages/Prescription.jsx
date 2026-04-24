@@ -572,7 +572,7 @@ export default function Prescription() {
           {/* Clinic Header */}
           <div style={{ borderBottom: '2px solid #16a34a', paddingBottom: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ color: '#16a34a', margin: 0 }}>Apollo Clinic</h2>
+              <h2 style={{ color: '#16a34a', margin: 0 }}>MediCore</h2>
               <div style={{ fontSize: '0.9rem', color: '#333', fontWeight: 'bold' }}>
                 {userName ? `Dr. ${userName}` : 'Doctor'}
               </div>

@@ -115,7 +115,7 @@ export default function Login() {
           </div>
 
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', textAlign: 'center' }}>
-            Apollo Clinic
+            MediCore
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: '1.6', margin: '0 0 48px', maxWidth: '260px' }}>
             Complete clinic management for modern healthcare
