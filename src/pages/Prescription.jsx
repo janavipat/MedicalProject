@@ -282,15 +282,16 @@ export default function Prescription() {
             // Auto-create follow-up if a date was provided
             if (patientData.followUpDate) {
               try {
+                const contact = patientData.phone?.trim() || '0000000000';
                 await authFetch(`${API}/api/followup`, {
                   method: 'POST',
                   body: JSON.stringify({
                     patientId,
                     patientName: patientData.name,
-                    diagnosis:   patientData.diagnosis || '',
-                    phone:       patientData.phone || '',
-                    followUpDate: patientData.followUpDate,
-                    status: 'Pending',
+                    contact,
+                    diagnosis: patientData.diagnosis || '',
+                    dueDate:   patientData.followUpDate,
+                    status:    'Pending',
                   }),
                 });
               } catch { /* non-critical */ }
