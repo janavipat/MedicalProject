@@ -14,6 +14,7 @@ import Inventory from './pages/Inventory';
 import FollowUp from './pages/FollowUp';
 import PatientHistory from './pages/PatientHistory';
 import Profile from './pages/Profile';
+import Service from './pages/Service';
 
 // Role-gated route: redirects to /dashboard if role not allowed
 function RoleRoute({ allow, children }) {
@@ -61,6 +62,7 @@ function App() {
                     <Route path="/inventory" element={<Inventory />} />
                     <Route path="/follow-ups" element={<FollowUp />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/service" element={<Service />} />
                   </Routes>
                 </Layout>
               </ProtectedRoute>
