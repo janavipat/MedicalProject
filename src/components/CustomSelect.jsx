@@ -48,11 +48,18 @@ export default function CustomSelect({
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
           padding: matchInput ? '12px 16px' : '7px 14px',
-          border: `1.5px solid ${hasValue ? (selected?.color || '#86efac') : 'var(--border-color)'}`,
-          borderRadius: '10px',
-          background: hasValue ? (selected?.bg || '#f0fdf4') : 'var(--bg-input, #f9fafb)',
-          color: hasValue ? (selected?.color || '#16a34a') : 'var(--text-muted)',
-          fontSize: '0.83rem', fontWeight: hasValue ? 600 : 400,
+          // matchInput: always look like a regular .input-field — neutral bg, normal border, normal text
+          border: matchInput
+            ? `1px solid var(--border-color, #e2e8f0)`
+            : `1.5px solid ${hasValue ? (selected?.color || '#86efac') : 'var(--border-color)'}`,
+          borderRadius: matchInput ? '8px' : '10px',
+          background: matchInput
+            ? 'var(--bg-muted, #f3f4f6)'
+            : hasValue ? (selected?.bg || '#f0fdf4') : 'var(--bg-input, #f9fafb)',
+          color: matchInput
+            ? 'var(--text-main)'
+            : hasValue ? (selected?.color || '#16a34a') : 'var(--text-muted)',
+          fontSize: '0.83rem', fontWeight: 400,
           cursor: 'pointer', outline: 'none',
           minWidth: width ? undefined : minWidth,
           width: width || undefined,
