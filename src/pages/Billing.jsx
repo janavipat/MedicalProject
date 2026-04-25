@@ -639,12 +639,6 @@ export default function Billing() {
                         {!bill.paidStatus && (
                           <>
                             <button
-                              style={{ padding: '5px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '7px', cursor: 'pointer', fontWeight: 600 }}
-                              onClick={() => setPaymentBill(bill)}
-                            >
-                              <QrCode size={13} /> Pay via QR
-                            </button>
-                            <button
                               className="btn btn-outline"
                               style={{ padding: '5px 10px', fontSize: '0.78rem' }}
                               onClick={() => markPaid(bill._id)}
