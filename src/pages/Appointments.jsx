@@ -493,7 +493,7 @@ function ReceptionistView({ queue, onAddAppointment }) {
   const emergencyRed = '#ef4444';
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', gap: '24px', height: '100%' }}>
+    <div className="animate-fade-in resp-panel-row">
 
       {/* ── Left: Booking form ── */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
@@ -600,7 +600,7 @@ function ReceptionistView({ queue, onAddAppointment }) {
               </div>
 
               {/* Patient details — always visible */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
+              <div className="resp-grid-3">
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Age</label>
                   <input className="input-field" type="number" placeholder="e.g. 35" min="0" max="120" value={form.age} onChange={e => set('age', e.target.value)} />
@@ -620,7 +620,7 @@ function ReceptionistView({ queue, onAddAppointment }) {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
+              <div className="resp-grid-3">
                 <div className="input-group" style={{ margin: 0 }}>
                   <label className="input-label">Blood Group</label>
                   <CustomSelect value={form.bloodGroup} onChange={v => set('bloodGroup', v)} width="100%" matchInput
@@ -708,7 +708,7 @@ function ReceptionistView({ queue, onAddAppointment }) {
       </div>
 
       {/* ── Right: Today's Queue ── */}
-      <div style={{ width: '340px', flexShrink: 0 }}>
+      <div className="resp-side-panel-340">
         <div className="page-header" style={{ marginBottom: '16px' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Today's Queue</h2>

@@ -367,7 +367,7 @@ export default function Prescription() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', gap: '24px', height: '100%' }}>
+    <div className="animate-fade-in resp-panel-row">
       {/* ══ LEFT PANEL — Prescription Builder ══════════════════════════════════ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <div className="page-header" style={{ marginBottom: '20px' }}>
@@ -382,7 +382,7 @@ export default function Prescription() {
         <div className="glass-panel" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           {/* Patient Info Row 1: Name + Age + Gender + Phone */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.5fr', gap: '16px' }}>
+          <div className="resp-grid-4">
             <div className="input-group" style={{ position: 'relative' }}>
               <label className="input-label">Patient Name</label>
               <input
@@ -447,7 +447,7 @@ export default function Prescription() {
           </div>
 
           {/* Patient Info Row 2: Address + Blood Group + Weight + Follow-up Date */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px' }}>
+          <div className="resp-grid-4b">
             <div className="input-group">
               <label className="input-label">Address</label>
               <input type="text" className="input-field" placeholder="Patient's address"
@@ -617,7 +617,7 @@ export default function Prescription() {
       </div>
 
       {/* ══ RIGHT PANEL — Live Preview & Actions ═══════════════════════════════ */}
-      <div style={{ width: '420px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '20px' }} className="no-print">
+      <div className="resp-side-panel-420 no-print" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
         {/* A4 Live Preview */}
         <div id="prescription-preview" className="glass-panel" style={{ flex: 1, backgroundColor: 'white', color: '#111', padding: '32px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', overflowY: 'auto' }}>

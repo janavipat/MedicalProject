@@ -441,6 +441,151 @@ h1, h2, h3, h4, h5, h6 {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Responsive Utilities ──────────────────────────────────────────────────── */
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 99;
+}
+
+/* Hamburger button (shown on mobile in header) */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Responsive panel row: side-by-side on desktop, stacked on mobile */
+.resp-panel-row {
+  display: flex;
+  gap: 24px;
+  height: 100%;
+}
+
+/* Fixed-width side panels (queue, preview) */
+.resp-side-panel-340 { width: 340px; flex-shrink: 0; }
+.resp-side-panel-420 { width: 420px; flex-shrink: 0; }
+
+/* Dashboard chart + queue split */
+.resp-chart-queue {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+/* Responsive grids */
+.resp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.resp-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.resp-grid-4 { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 16px; }
+.resp-grid-4b { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; }
+
+/* ── Tablet (≤ 1024px) ───────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 200px; }
+
+  .top-header { padding: 0 20px; }
+  .main-content { padding: 0 20px 24px; }
+
+  .resp-chart-queue { grid-template-columns: 1fr; }
+  .resp-side-panel-420 { width: 340px; }
+  .resp-grid-4  { grid-template-columns: 1fr 1fr; }
+  .resp-grid-4b { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Mobile (≤ 768px) ────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Sidebar: off-canvas drawer */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 200;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  }
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.sidebar-open {
+    display: block;
+  }
+
+  /* Main wrapper takes full width */
+  .main-wrapper { width: 100%; }
+
+  /* Header */
+  .hamburger-btn { display: flex; }
+  .top-header { padding: 0 16px; gap: 12px; }
+  .top-header-search { flex: 1; min-width: 0; }
+  .top-header-search input { font-size: 0.85rem; }
+
+  /* Content */
+  .main-content { padding: 0 14px 20px; }
+
+  /* Page header: stack title + actions */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-top: 16px;
+  }
+  .page-header > div:last-child { width: 100%; }
+  .page-title { font-size: 1.4rem; }
+
+  /* Dashboard stat cards: full width on tiny screens */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* Chart + queue: single column */
+  .resp-chart-queue { grid-template-columns: 1fr; gap: 16px; }
+
+  /* Side panels: become full width, stacked */
+  .resp-panel-row { flex-direction: column; height: auto; }
+  .resp-side-panel-340 { width: 100%; }
+  .resp-side-panel-420 { width: 100%; }
+
+  /* Form grids: 2-col → 1-col, 3/4-col → 1-col */
+  .resp-grid-2  { grid-template-columns: 1fr; }
+  .resp-grid-3  { grid-template-columns: 1fr 1fr; }
+  .resp-grid-4  { grid-template-columns: 1fr 1fr; }
+  .resp-grid-4b { grid-template-columns: 1fr 1fr; }
+
+  /* Tables: allow horizontal scroll */
+  .glass-panel .data-table { min-width: 600px; }
+  .glass-panel { overflow-x: auto; }
+
+  /* Billing receipt form */
+  .billing-receipt-grid { grid-template-columns: 1fr !important; }
+
+  /* Buttons: smaller on mobile */
+  .btn { padding: 8px 14px; font-size: 0.85rem; }
+}
+
+/* ── Small Mobile (≤ 480px) ──────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .resp-grid-3 { grid-template-columns: 1fr; }
+  .page-title { font-size: 1.2rem; }
+  .stat-info .stat-value { font-size: 1.4rem; }
+}
+
 /* Print Styles */
 @media print {
   @page {

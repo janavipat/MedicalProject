@@ -23,7 +23,7 @@ const ROLE_BADGES = {
   Receptionist: { icon: ClipboardList, color: '#059669', bg: 'rgba(5,150,105,0.10)' },
 };
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const { role, userName, logout } = useAuth();
   const navigate = useNavigate();
   const badge = ROLE_BADGES[role] || ROLE_BADGES.Receptionist;
@@ -32,7 +32,7 @@ export default function Sidebar() {
   const visible = navItems.filter(item => !item.roles || item.roles.includes(role));
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isOpen ? ' sidebar-open' : ''}`}>
       {/* Brand + Role Badge aligned in header */}
       <div className="sidebar-header" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '4px', padding: '0 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

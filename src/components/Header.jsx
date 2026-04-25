@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut, UserCircle, Phone, History, X, Loader2, RefreshCw } from 'lucide-react';
+import { Bell, Search, User, LogOut, UserCircle, Phone, History, X, Loader2, RefreshCw, Menu } from 'lucide-react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 const AVATAR_KEY = (uid) => `ayurclinic_avatar_${uid}`;
 const API = 'https://medical-project-h6yc.vercel.app';
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const { user, logout, authFetch } = useAuth();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -139,8 +139,13 @@ export default function Header() {
 
   return (
     <header className="top-header">
+      {/* Hamburger — visible on mobile only */}
+      <button className="hamburger-btn" onClick={onMenuClick} aria-label="Open menu">
+        <Menu size={20} />
+      </button>
+
       {/* ── Global Search ── */}
-      <div ref={searchRef} style={{ position: 'relative', width: '440px' }}>
+      <div ref={searchRef} className="top-header-search" style={{ position: 'relative', flex: 1, maxWidth: '440px' }}>
         <div style={{
           display: 'flex', alignItems: 'center', background: 'var(--bg-card)',
           padding: '10px 16px', borderRadius: '10px',

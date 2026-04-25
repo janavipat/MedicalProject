@@ -343,7 +343,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Chart + Queue ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'stretch' }}>
+      <div className="resp-chart-queue">
 
         {/* Chart */}
         <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>

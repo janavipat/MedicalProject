@@ -48,49 +48,62 @@ function PaymentQRModal({ bill, onClose, onPaid, authFetch }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div style={{ background: 'white', borderRadius: '20px', width: '100%', maxWidth: '420px', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}>
-        <div style={{ background: 'linear-gradient(135deg,#16a34a,#15803d)', padding: '20px 24px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '2px' }}>Payment QR</div>
-            <div style={{ fontSize: '0.82rem', opacity: 0.85 }}>{bill.patientName} · {bill.invoiceNumber || 'Invoice'}</div>
-          </div>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '8px', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-            <X size={16} />
-          </button>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'white', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+
+      {/* ── Full-page header bar ── */}
+      <div style={{ background: 'linear-gradient(135deg,#16a34a,#15803d)', padding: '20px 32px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: '1.2rem' }}>UPI Payment</div>
+          <div style={{ fontSize: '0.85rem', opacity: 0.85, marginTop: '2px' }}>{bill.patientName} · Invoice {bill.invoiceNumber || bill._id?.slice(-6).toUpperCase()}</div>
         </div>
-        <div style={{ padding: '24px', textAlign: 'center' }}>
-          {paid ? (
-            <div style={{ padding: '24px 0' }}>
-              <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', border: '3px solid #86efac', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                <CheckCircle size={36} color="#16a34a" />
-              </div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#15803d', marginBottom: '6px' }}>Payment Received!</div>
-              <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>₹{bill.totalAmount} · {bill.patientName}</div>
-              <button onClick={onClose} style={{ marginTop: '20px', padding: '10px 32px', background: 'linear-gradient(135deg,#16a34a,#15803d)', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}>Done</button>
+        <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '10px', padding: '8px 18px', cursor: 'pointer', color: 'white', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <X size={16} /> Close
+        </button>
+      </div>
+
+      {/* ── Full-page body ── */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', background: 'linear-gradient(160deg,#f0fdf4 0%,#ffffff 100%)' }}>
+        {paid ? (
+          <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+            <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#f0fdf4', border: '4px solid #86efac', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+              <CheckCircle size={52} color="#16a34a" />
             </div>
-          ) : (
-            <>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#16a34a', marginBottom: '4px' }}>{fmt(bill.totalAmount)}</div>
-              <div style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: '20px' }}>Scan to pay via GPay, PhonePe, Paytm or any UPI app</div>
-              <div style={{ display: 'inline-block', padding: '12px', background: 'white', border: '2px solid #dcfce7', borderRadius: '16px', marginBottom: '20px', boxShadow: '0 2px 12px rgba(22,163,74,0.1)' }}>
-                <img src={qrUrl} alt="UPI QR Code" width={200} height={200} style={{ display: 'block', borderRadius: '8px' }} />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.78rem', color: '#16a34a', marginBottom: '20px', background: '#f0fdf4', padding: '8px 14px', borderRadius: '20px', width: 'fit-content', margin: '0 auto 20px' }}>
-                <Wifi size={13} className="animate-pulse" /> Waiting for payment…
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={copyLink} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0', background: copied ? '#f0fdf4' : 'white', color: copied ? '#16a34a' : '#374151', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                  {copied ? <><CheckCheck size={15} /> Copied!</> : <><Copy size={15} /> Copy Link</>}
-                </button>
-                <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(waMsg)}`, '_blank')} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                  <MessageCircle size={15} /> Send WhatsApp
-                </button>
-              </div>
-              <div style={{ marginTop: '12px', fontSize: '0.72rem', color: '#9ca3af' }}>UPI ID: {CLINIC_UPI} · Status auto-updates every 5s</div>
-            </>
-          )}
-        </div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#15803d', marginBottom: '8px' }}>Payment Received!</div>
+            <div style={{ fontSize: '1rem', color: '#6b7280', marginBottom: '32px' }}>{fmt(bill.totalAmount)} collected from {bill.patientName}</div>
+            <button onClick={onClose} style={{ padding: '14px 48px', background: 'linear-gradient(135deg,#16a34a,#15803d)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 16px rgba(22,163,74,0.3)' }}>
+              Back to Billing
+            </button>
+          </div>
+        ) : (
+          <div style={{ width: '100%', maxWidth: '560px', textAlign: 'center' }}>
+            {/* Amount */}
+            <div style={{ fontSize: '3rem', fontWeight: 800, color: '#16a34a', marginBottom: '4px', lineHeight: 1 }}>{fmt(bill.totalAmount)}</div>
+            <div style={{ fontSize: '0.95rem', color: '#6b7280', marginBottom: '32px' }}>Scan to pay via GPay, PhonePe, Paytm or any UPI app</div>
+
+            {/* QR Code — large */}
+            <div style={{ display: 'inline-block', padding: '18px', background: 'white', border: '3px solid #bbf7d0', borderRadius: '24px', marginBottom: '28px', boxShadow: '0 8px 32px rgba(22,163,74,0.15)' }}>
+              <img src={qrUrl} alt="UPI QR Code" width={280} height={280} style={{ display: 'block', borderRadius: '10px' }} />
+            </div>
+
+            {/* Waiting indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.88rem', color: '#16a34a', marginBottom: '28px', background: '#f0fdf4', padding: '10px 20px', borderRadius: '24px', width: 'fit-content', margin: '0 auto 28px', border: '1px solid #bbf7d0' }}>
+              <Wifi size={15} className="animate-pulse" /> Waiting for payment confirmation…
+            </div>
+
+            {/* UPI ID */}
+            <div style={{ fontSize: '0.82rem', color: '#9ca3af', marginBottom: '28px' }}>UPI ID: <strong style={{ color: '#374151' }}>{CLINIC_UPI}</strong> · Status auto-updates every 5s</div>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={copyLink} style={{ flex: '1 1 180px', maxWidth: '240px', padding: '13px 20px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: copied ? '#f0fdf4' : 'white', color: copied ? '#16a34a' : '#374151', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                {copied ? <><CheckCheck size={17} /> Copied!</> : <><Copy size={17} /> Copy UPI Link</>}
+              </button>
+              <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(waMsg)}`, '_blank')} style={{ flex: '1 1 180px', maxWidth: '240px', padding: '13px 20px', borderRadius: '12px', border: 'none', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(37,211,102,0.3)' }}>
+                <MessageCircle size={17} /> Send WhatsApp
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
