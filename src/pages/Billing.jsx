@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   IndianRupee, FileText, CheckCircle, Search,
   Loader2, RefreshCw, AlertCircle, Plus, X, Trash2, User,
+  QrCode, MessageCircle, Copy, CheckCheck, Wifi,
 } from 'lucide-react';
 import MedicalLoader from '../components/MedicalLoader.jsx';
 import CustomSelect from '../components/CustomSelect.jsx';
@@ -10,6 +11,90 @@ import { useAuth } from '../context/AuthContext.jsx';
 const API = 'https://medical-project-h6yc.vercel.app';
 const fmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
 const emptyItem = () => ({ id: Date.now() + Math.random(), description: '', amount: '' });
+
+// ── UPI payment helpers ───────────────────────────────────────────────────────
+const CLINIC_UPI  = 'clinic@upi';
+const CLINIC_NAME = 'MediCore Clinic';
+const buildUpiLink = (amount, ref) =>
+  `upi://pay?pa=${encodeURIComponent(CLINIC_UPI)}&pn=${encodeURIComponent(CLINIC_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Invoice ' + (ref || ''))}`;
+const buildQrUrl = (amount, ref) =>
+  `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=15803d&bgcolor=ffffff&data=${encodeURIComponent(buildUpiLink(amount, ref))}`;
+
+// ── Payment QR Modal ──────────────────────────────────────────────────────────
+function PaymentQRModal({ bill, onClose, onPaid, authFetch }) {
+  const [paid, setPaid]     = useState(bill.paidStatus);
+  const [copied, setCopied] = useState(false);
+  const intervalRef         = useRef(null);
+
+  const upiLink = buildUpiLink(bill.totalAmount, bill.invoiceNumber || bill._id?.slice(-6));
+  const qrUrl   = buildQrUrl(bill.totalAmount, bill.invoiceNumber || bill._id?.slice(-6));
+  const waMsg   = `Hello! Please pay ₹${bill.totalAmount} for your invoice at ${CLINIC_NAME}.\n\nScan & Pay via UPI:\n${upiLink}`;
+
+  useEffect(() => {
+    if (paid) return;
+    intervalRef.current = setInterval(async () => {
+      try {
+        const r = await authFetch(`${API}/api/billing/${bill._id}`);
+        if (!r.ok) return;
+        const data = (await r.json()).bill || (await r.json());
+        if (data.paidStatus) { setPaid(true); onPaid(); clearInterval(intervalRef.current); }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(intervalRef.current);
+  }, [paid]);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(upiLink).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ background: 'white', borderRadius: '20px', width: '100%', maxWidth: '420px', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}>
+        <div style={{ background: 'linear-gradient(135deg,#16a34a,#15803d)', padding: '20px 24px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '2px' }}>Payment QR</div>
+            <div style={{ fontSize: '0.82rem', opacity: 0.85 }}>{bill.patientName} · {bill.invoiceNumber || 'Invoice'}</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '8px', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+            <X size={16} />
+          </button>
+        </div>
+        <div style={{ padding: '24px', textAlign: 'center' }}>
+          {paid ? (
+            <div style={{ padding: '24px 0' }}>
+              <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', border: '3px solid #86efac', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <CheckCircle size={36} color="#16a34a" />
+              </div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#15803d', marginBottom: '6px' }}>Payment Received!</div>
+              <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>₹{bill.totalAmount} · {bill.patientName}</div>
+              <button onClick={onClose} style={{ marginTop: '20px', padding: '10px 32px', background: 'linear-gradient(135deg,#16a34a,#15803d)', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}>Done</button>
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#16a34a', marginBottom: '4px' }}>{fmt(bill.totalAmount)}</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: '20px' }}>Scan to pay via GPay, PhonePe, Paytm or any UPI app</div>
+              <div style={{ display: 'inline-block', padding: '12px', background: 'white', border: '2px solid #dcfce7', borderRadius: '16px', marginBottom: '20px', boxShadow: '0 2px 12px rgba(22,163,74,0.1)' }}>
+                <img src={qrUrl} alt="UPI QR Code" width={200} height={200} style={{ display: 'block', borderRadius: '8px' }} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.78rem', color: '#16a34a', marginBottom: '20px', background: '#f0fdf4', padding: '8px 14px', borderRadius: '20px', width: 'fit-content', margin: '0 auto 20px' }}>
+                <Wifi size={13} className="animate-pulse" /> Waiting for payment…
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button onClick={copyLink} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0', background: copied ? '#f0fdf4' : 'white', color: copied ? '#16a34a' : '#374151', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  {copied ? <><CheckCheck size={15} /> Copied!</> : <><Copy size={15} /> Copy Link</>}
+                </button>
+                <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(waMsg)}`, '_blank')} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <MessageCircle size={15} /> Send WhatsApp
+                </button>
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '0.72rem', color: '#9ca3af' }}>UPI ID: {CLINIC_UPI} · Status auto-updates every 5s</div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Inline Create Receipt Form ───────────────────────────────────────────────
 function CreateReceiptForm({ onClose, onSaved, authFetch }) {
@@ -370,6 +455,7 @@ export default function Billing() {
   const [error, setError]            = useState('');
   const [markingId, setMarkingId]    = useState(null);
   const [showCreate, setShowCreate]  = useState(false);
+  const [paymentBill, setPaymentBill] = useState(null);
 
   const fetchBills = useCallback(async () => {
     setLoading(true); setError('');
@@ -407,6 +493,14 @@ export default function Billing() {
   return (
     <div className="animate-fade-in">
 
+      {paymentBill && (
+        <PaymentQRModal
+          bill={paymentBill}
+          authFetch={authFetch}
+          onClose={() => setPaymentBill(null)}
+          onPaid={() => { fetchBills(); }}
+        />
+      )}
 
       <div className="page-header">
         <div>
@@ -530,14 +624,22 @@ export default function Billing() {
                     <td>
                       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                         {!bill.paidStatus && (
-                          <button
-                            className="btn btn-outline"
-                            style={{ padding: '5px 10px', fontSize: '0.78rem' }}
-                            onClick={() => markPaid(bill._id)}
-                            disabled={markingId === bill._id}
-                          >
-                            {markingId === bill._id ? <Loader2 size={12} className="animate-spin" /> : '✓ Mark Paid'}
-                          </button>
+                          <>
+                            <button
+                              style={{ padding: '5px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '7px', cursor: 'pointer', fontWeight: 600 }}
+                              onClick={() => setPaymentBill(bill)}
+                            >
+                              <QrCode size={13} /> Pay via QR
+                            </button>
+                            <button
+                              className="btn btn-outline"
+                              style={{ padding: '5px 10px', fontSize: '0.78rem' }}
+                              onClick={() => markPaid(bill._id)}
+                              disabled={markingId === bill._id}
+                            >
+                              {markingId === bill._id ? <Loader2 size={12} className="animate-spin" /> : '✓ Cash'}
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>
